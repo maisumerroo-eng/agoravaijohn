@@ -790,18 +790,25 @@ function alternarMudoLive() {
   if (live.mudo) enviarLive({ realtimeInput: { audioStreamEnd: true } });
 }
 
-// ---- vídeo da TV: 1 quadro/s quando muda, senão a cada 4 s ----
+// ---- vídeo da TV: 1 quadro por segundo, sempre (o máximo que o Gemini ao vivo aceita) ----
 function iniciarVideoLive() {
   clearInterval(live.timerVideo);
+  const mini = $("miniatura"), legenda = document.querySelector(".miniatura figcaption");
   live.timerVideo = setInterval(() => {
-    if (!live.ativo || pausado || live.reconectando || live.ws?.readyState !== 1) return;
-    const mudou = mudouBastante();
-    if (!mudou && Date.now() - live.ultimoVideo < 4000) return;
+    if (!live.ativo || pausado || live.reconectando || live.ws?.readyState !== 1) {
+      if (legenda && live.ativo) legenda.textContent = pausado ? "⏸ pausado" : "… reconectando";
+      return;
+    }
     const img = capturar(1024, 0.7);
     if (!img) return;
     live.ultimoVideo = Date.now();
-    const mini = $("miniatura"); if (mini) { mini.src = img; mini.hidden = false; }
+    live.quadros = (live.quadros || 0) + 1;
     enviarLive({ realtimeInput: { video: { data: img.split(",")[1], mimeType: "image/jpeg" } } });
+    if (mini) {
+      mini.src = img; mini.hidden = false;
+      mini.classList.remove("piscar"); void mini.offsetWidth; mini.classList.add("piscar");
+    }
+    if (legenda) legenda.textContent = "👁 assistindo ao vivo";
   }, 1000);
 }
 
