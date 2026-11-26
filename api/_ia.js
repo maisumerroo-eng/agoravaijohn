@@ -29,8 +29,12 @@ export function criarCliente(req) {
 export function erroIA(e, res) {
   if (e instanceof Anthropic.AuthenticationError) return res.status(401).json({ erro: "Acesso à IA inválido." });
   if (e instanceof Anthropic.RateLimitError) return res.status(429).json({ erro: "Muitas requisições. Espera um pouco." });
-  if (e instanceof Anthropic.PermissionDeniedError || e?.status === 402)
-    return res.status(402).json({ erro: "Crédito grátis do mês acabou. Volta no próximo ciclo." });
+  if (e instanceof Anthropic.PermissionDeniedError || e?.status === 402) {
+    const msg = String(e?.error?.error?.message || e?.message || "").slice(0, 300);
+    console.error(e.status, msg);
+    const credito = /credit|balance|quota|insufficient|billing/i.test(msg);
+    return res.status(402).json({ erro: credito ? "Sem crédito na IA da Vercel: " + msg : "IA recusou o acesso: " + msg });
+  }
   if (e instanceof Anthropic.APIError) {
     console.error(e.status, e.message);
     return res.status(502).json({ erro: `Erro da IA (${e.status ?? "rede"})` });
