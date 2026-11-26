@@ -74,7 +74,7 @@ export default async function handler(req, res) {
       return res.end();
     } catch (e) {
       if (comecou) { enviar({ erro: "Caiu no meio da resposta." }); return res.end(); }
-      return respostaErroGemini(e, res);
+      return respostaErroGemini(e, res, gkey);
     }
   }
 

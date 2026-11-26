@@ -37,8 +37,9 @@ async function erroGemini(r) {
   return Object.assign(new Error(msg || `Gemini ${r.status}`), { status: r.status, gemini: true });
 }
 
-export function respostaErroGemini(e, res) {
+export function respostaErroGemini(e, res, chave = "") {
   const msg = String(e.message || "").slice(0, 200);
+  if (/^vck_/.test(chave)) return res.status(401).json({ erro: "Essa chave é da Vercel (vck_), não do Google. Pegue a do Gemini (começa com AIza) em aistudio.google.com/apikey." });
   if (e.status === 429) return res.status(429).json({ erro: "Limite grátis do Google atingido (por minuto ou do dia). Espera um pouco ou aumenta o intervalo." });
   if (e.status === 400 && /api key/i.test(msg)) return res.status(401).json({ erro: "Chave do Gemini inválida." });
   if (e.status === 403) return res.status(401).json({ erro: "Chave do Gemini sem permissão: " + msg });

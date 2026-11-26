@@ -71,7 +71,7 @@ export default async function handler(req, res) {
       return res.status(200).json(JSON.parse(r.texto.slice(r.texto.indexOf("{"), r.texto.lastIndexOf("}") + 1)));
     } catch (e) {
       if (e instanceof SyntaxError) return res.status(502).json({ erro: "Resposta do Gemini veio quebrada." });
-      return respostaErroGemini(e, res);
+      return respostaErroGemini(e, res, gkey);
     }
   }
 
