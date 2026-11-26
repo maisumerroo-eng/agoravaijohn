@@ -13,22 +13,23 @@ const chaveEnv = () => {
 };
 export const chaveGemini = (req) => String(req.headers["x-gemini-key"] || "").trim() || chaveEnv();
 
-let modeloCache = null;
-async function escolherModelo(chave) {
-  if (process.env.GEMINI_MODELO) return process.env.GEMINI_MODELO;
-  if (modeloCache && Date.now() - modeloCache.em < 6 * 3600e3) return modeloCache.nome;
+// Lista de modelos candidatos (mais rápidos/baratos primeiro). Se um der "sem cota" (429), tenta o próximo.
+let listaCache = null, modeloBom = null;
+async function listarModelos(chave) {
+  if (process.env.GEMINI_MODELO) return [process.env.GEMINI_MODELO];
+  if (listaCache && Date.now() - listaCache.em < 6 * 3600e3) return listaCache.nomes;
   const r = await fetch(`${BASE}/models?pageSize=200`, { headers: { "x-goog-api-key": chave } });
   if (!r.ok) throw await erroGemini(r);
   const { models = [] } = await r.json();
   const nomes = models
     .filter((m) => m.supportedGenerationMethods?.includes("generateContent"))
     .map((m) => m.name.replace(/^models\//, ""))
-    .filter((n) => !/preview|exp|tts|image|live|audio|embedding/i.test(n));
-  for (const re of PREFERIDOS) {
-    const achados = nomes.filter((n) => re.test(n)).sort().reverse(); // versão mais nova primeiro
-    if (achados.length) { modeloCache = { nome: achados[0], em: Date.now() }; return achados[0]; }
-  }
-  throw Object.assign(new Error("Nenhum modelo Gemini Flash disponível pra essa chave."), { status: 404 });
+    .filter((n) => !/preview|exp|tts|image|live|audio|embedding|robotics|computer/i.test(n));
+  const ordem = [];
+  for (const re of PREFERIDOS) for (const n of nomes.filter((n) => re.test(n)).sort().reverse()) if (!ordem.includes(n)) ordem.push(n);
+  if (!ordem.length) throw Object.assign(new Error("Nenhum modelo Gemini Flash disponível pra essa chave."), { status: 404 });
+  listaCache = { nomes: ordem.slice(0, 6), em: Date.now() };
+  return listaCache.nomes;
 }
 
 async function erroGemini(r) {
@@ -40,7 +41,7 @@ async function erroGemini(r) {
 export function respostaErroGemini(e, res, chave = "") {
   const msg = String(e.message || "").slice(0, 200);
   if (/^vck_/.test(chave)) return res.status(401).json({ erro: "Essa chave é da Vercel (vck_), não do Google. Pegue a do Gemini em aistudio.google.com/apikey." });
-  if (e.status === 429) return res.status(429).json({ erro: "Limite grátis do Google atingido (por minuto ou do dia). Espera um pouco ou aumenta o intervalo." });
+  if (e.status === 429) return res.status(429).json({ erro: "Limite grátis do Google atingido. Espera um pouco ou aumenta o intervalo. (" + msg.slice(0, 160) + ")" });
   if (e.status === 400 && /api key/i.test(msg)) return res.status(401).json({ erro: "Chave do Gemini inválida." });
   if (e.status === 403) return res.status(401).json({ erro: "Chave do Gemini sem permissão: " + msg });
   return res.status(502).json({ erro: "Erro no Gemini: " + msg });
@@ -66,14 +67,16 @@ export function paraSchemaGemini(s) {
 
 const imagemParte = (b64) => ({ inline_data: { mime_type: "image/jpeg", data: b64 } });
 
-// Chamada única (com retry sem thinkingConfig/busca se o modelo não aceitar).
+// Tenta: modelo que funcionou por último -> outros da lista. Em cada um: com pensamento+busca -> sem pensamento
+// -> sem busca. 429 (sem cota) pula pro próximo modelo; 400 de parâmetro tenta a versão mais simples.
 export async function gerarGemini({ chave, system, historico = [], partes, schema, busca = false, maxTokens = 800, aoTexto }) {
-  const modelo = await escolherModelo(chave);
+  const lista = await listarModelos(chave);
+  const modelos = modeloBom && lista.includes(modeloBom) ? [modeloBom, ...lista.filter((m) => m !== modeloBom)] : lista;
   const contents = [
     ...historico.map((h) => ({ role: h.role === "assistant" ? "model" : "user", parts: [{ text: h.content }] })),
     { role: "user", parts: partes.map((p) => (p.imagem ? imagemParte(p.imagem) : { text: p.texto })) },
   ];
-  const montar = (opc) => ({
+  const montar = (modelo, opc) => ({
     systemInstruction: { parts: [{ text: system }] },
     contents,
     generationConfig: {
@@ -85,21 +88,27 @@ export async function gerarGemini({ chave, system, historico = [], partes, schem
     ...(opc.busca ? { tools: [{ google_search: {} }] } : {}),
   });
 
-  const tentativas = [{ pensar: true, busca }, { pensar: false, busca }, ...(busca ? [{ pensar: false, busca: false }] : [])];
+  const tentativas = [{ pensar: true, busca }, { pensar: false, busca }, ...(busca ? [{ pensar: true, busca: false }, { pensar: false, busca: false }] : [])];
   let ultimoErro;
-  for (const opc of tentativas) {
-    const stream = !!aoTexto;
-    const url = `${BASE}/models/${modelo}:${stream ? "streamGenerateContent?alt=sse" : "generateContent"}`;
-    const r = await fetch(url, {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-goog-api-key": chave },
-      body: JSON.stringify(montar(opc)),
-    });
-    if (!r.ok) {
-      ultimoErro = await erroGemini(r);
-      if (r.status === 400 && !/api key/i.test(ultimoErro.message)) continue; // parâmetro não suportado: tenta mais simples
+  for (const modelo of modelos) {
+    let r = null;
+    for (const opc of tentativas) {
+      const url = `${BASE}/models/${modelo}:${aoTexto ? "streamGenerateContent?alt=sse" : "generateContent"}`;
+      const resp = await fetch(url, {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-goog-api-key": chave },
+        body: JSON.stringify(montar(modelo, opc)),
+      });
+      if (resp.ok) { r = resp; break; }
+      ultimoErro = await erroGemini(resp);
+      ultimoErro.message = `[${modelo}] ${ultimoErro.message}`;
+      if (resp.status === 400 && !/api key/i.test(ultimoErro.message)) continue; // parâmetro não suportado
+      if (resp.status === 429 && opc.busca) continue;                            // talvez só a busca esteja sem cota
+      if (resp.status === 429 || resp.status === 404) break;                     // modelo sem cota: próximo modelo
       throw ultimoErro;
     }
+    if (!r) continue;
+    modeloBom = modelo;
     let texto = "";
     const fontes = [];
     let pesquisou = false;
@@ -116,7 +125,7 @@ export async function gerarGemini({ chave, system, historico = [], partes, schem
         }
       }
     };
-    if (stream) {
+    if (aoTexto) {
       const dec = new TextDecoder();
       let buf = "";
       for await (const pedaco of r.body) {
