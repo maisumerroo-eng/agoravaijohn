@@ -4,9 +4,11 @@ import analisar from "./api/analisar.js";
 import conversar from "./api/conversar.js";
 import voz from "./api/voz.js";
 import status from "./api/status.js";
+import liveToken from "./api/live-token.js";
+import buscar from "./api/buscar.js";
 import ARQUIVOS from "./static-files.js";
 
-const ROTAS = { "/api/analisar": analisar, "/api/conversar": conversar, "/api/voz": voz, "/api/status": status };
+const ROTAS = { "/api/analisar": analisar, "/api/conversar": conversar, "/api/voz": voz, "/api/status": status, "/api/live-token": liveToken, "/api/buscar": buscar };
 
 async function executar(handler, request, env, ctx) {
   // Variáveis/segredos do Worker -> process.env (os handlers leem de lá).

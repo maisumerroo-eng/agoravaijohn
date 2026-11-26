@@ -15,6 +15,7 @@ const cfg = {
   chave: LS.get("chave", ""),
   voz: LS.get("voz", true),
   ouvir: LS.get("ouvir", true),
+  aoVivo: LS.get("aoVivo", true),
   ativacao: LS.get("ativacao", true),
   nome: LS.get("nome", "John"),
   gemini: LS.get("gemini", ""),
@@ -91,12 +92,20 @@ async function ligarCamera() {
     $("inicio").hidden = true;
     $("app").hidden = false;
     pedirWakeLock();
-    agendar(1500);
-    if (cfg.ouvir) ouvir();
-    setTimeout(() => falarConversa(`E aí, ${cfg.nome}! Tô vendo a tela. É só chamar "parça" e falar comigo.`), 800);
+    if (cfg.aoVivo) {
+      try { await iniciarLive(); return; }
+      catch (e) { console.warn("Ao vivo falhou:", e.message); status("Ao vivo indisponível, modo clássico", "pausado"); }
+    }
+    iniciarClassico();
   } catch (e) {
     alert("Não deu pra abrir a câmera. Libera a permissão e abre o site em HTTPS.\n\n" + e.message);
   }
+}
+
+function iniciarClassico() {
+  agendar(1500);
+  if (cfg.ouvir) ouvir();
+  setTimeout(() => falarConversa(`E aí, ${cfg.nome}! Tô vendo a tela. É só chamar "parça" e falar comigo.`), 800);
 }
 
 async function pedirWakeLock() {
@@ -138,6 +147,7 @@ function mudouBastante() {
 // ---------- Ciclo (leitura automática da tela) ----------
 function agendar(ms) {
   clearTimeout(timer);
+  if (live.ativo) return;            // no ao vivo o vídeo vai contínuo
   if (pausado || cfg.intervalo === 0) return;
   timer = setTimeout(() => analisar(false), ms ?? cfg.intervalo * 1000);
 }
@@ -455,7 +465,7 @@ function tratarFala(frase, alternativas = []) {
 }
 
 function ouvir() {
-  if (!Reconhecedor || ouvindo || falando()) return;
+  if (live.ativo || !Reconhecedor || ouvindo || falando()) return;
   rec = new Reconhecedor();
   rec.lang = "pt-BR";
   rec.interimResults = true;
@@ -494,6 +504,7 @@ function pararOuvir(temporario) {
 // Toque no mic: grava sua pergunta e manda o ÁUDIO pra IA (entende bem melhor com o barulho do jogo).
 // Tocar de novo enquanto grava = parar e enviar.
 btnMic.addEventListener("click", () => {
+  if (live.ativo) return alternarMudoLive();
   if (gravando) return gravando.parar();
   pararFala();
   gravarPergunta();
@@ -578,7 +589,7 @@ $("btnIniciar").addEventListener("click", () => {
   ligarCamera();
 });
 
-$("btnAgora").addEventListener("click", () => analisar(true));
+$("btnAgora").addEventListener("click", () => live.ativo ? enviarTextoLive("O que tá rolando na tela agora? Me explica e me dá a melhor dica.", true) : analisar(true));
 
 $("formPergunta").addEventListener("submit", (e) => {
   e.preventDefault();
@@ -586,7 +597,7 @@ $("formPergunta").addEventListener("submit", (e) => {
   if (!q) return;
   $("inputPergunta").value = "";
   $("inputPergunta").blur();
-  conversar(q);
+  if (live.ativo) enviarTextoLive(q); else conversar(q);
 });
 
 const btnVoz = $("btnVoz");
@@ -601,10 +612,11 @@ $("btnPausa").addEventListener("click", () => {
   pausado = !pausado;
   $("btnPausa").textContent = pausado ? "▶" : "⏸";
   $("btnPausa").setAttribute("aria-label", pausado ? "Continuar" : "Pausar");
+  if (live.ativo) { if (pausado) { pararAudioLive(); status("Pausado (ao vivo)", "pausado"); } else { religarCamera("botão continuar"); status("Ao vivo 🔴", "ok"); } return; }
   if (pausado) { clearTimeout(timer); status("Pausado", "pausado"); } else { religarCamera("botão continuar"); agendar(300); }
 });
 
-const CAMPOS = { vozIA: "cfgVozIA", vozNome: "cfgVozNome", gemini: "cfgGemini", velocidade: "cfgVelocidade", intervalo: "cfgIntervalo", foco: "cfgFoco", spoilers: "cfgSpoilers", pular: "cfgPular", chave: "cfgChave", ouvir: "cfgOuvir", ativacao: "cfgAtivacao", nome: "cfgNome" };
+const CAMPOS = { aoVivo: "cfgAoVivo", vozIA: "cfgVozIA", vozNome: "cfgVozNome", gemini: "cfgGemini", velocidade: "cfgVelocidade", intervalo: "cfgIntervalo", foco: "cfgFoco", spoilers: "cfgSpoilers", pular: "cfgPular", chave: "cfgChave", ouvir: "cfgOuvir", ativacao: "cfgAtivacao", nome: "cfgNome" };
 const dlg = $("config");
 $("btnConfig").addEventListener("click", () => {
   for (const [k, id] of Object.entries(CAMPOS)) {
@@ -620,6 +632,7 @@ dlg.addEventListener("close", () => {
     LS.set(k, cfg[k]);
   }
   if (!cfg.nome) cfg.nome = "John";
+  if (live.ativo || (cfg.aoVivo && !$("app").hidden)) { reiniciarLive(); return; } // aplica nome/voz/spoilers
   if (cfg.ouvir) ouvir(); else pararOuvir(false);
   agendar();
 });
@@ -670,3 +683,188 @@ $("btnTestarVoz").addEventListener("click", () => {
   vozIAPausadaAte = 0;
   falarBase(`Fala, ${cfg.nome || "John"}! Essa é minha voz. Se tiver estrela de procurado, me chama que eu te explico o caminho certinho.`);
 });
+
+// =====================================================================================
+// MODO AO VIVO (Gemini Live): vídeo da TV + voz contínuos, resposta falada na hora.
+// O celular conecta direto no Google com um token temporário (a chave fica no servidor).
+// =====================================================================================
+const live = { ws: null, ativo: false, handle: null, url: "", modelo: "", micCtx: null, micStream: null, proc: null,
+  outCtx: null, prox: 0, sons: [], timerVideo: null, mudo: false, reconectando: false, ouvido: "", fala: "",
+  ultimoVideo: 0, falhas: [], fontes: [] };
+
+const b64DeBytes = (u8) => { let s = ""; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode(...u8.subarray(i, i + 0x8000)); return btoa(s); };
+const enviarLive = (obj) => { if (live.ws?.readyState === 1) live.ws.send(JSON.stringify(obj)); };
+
+async function conectarLive() {
+  const r = await fetch("/api/live-token", { method: "POST", headers: headersIA(), body: JSON.stringify({ nome: cfg.nome, spoilers: cfg.spoilers, voz: cfg.vozNome }) });
+  const t = await r.json().catch(() => ({}));
+  if (!r.ok || !t.token) throw new Error(t.erro || "token " + r.status);
+  live.url = t.url; live.modelo = t.modelo;
+  await new Promise((ok, erro) => {
+    const ws = new WebSocket(t.url + "?access_token=" + encodeURIComponent(t.token));
+    live.ws = ws;
+    let pronto = false;
+    const tempo = setTimeout(() => { if (!pronto) { erro(new Error("sem resposta do Gemini")); try { ws.close(); } catch {} } }, 12000);
+    ws.onopen = () => ws.send(JSON.stringify({ setup: { model: "models/" + t.modelo, sessionResumption: live.handle ? { handle: live.handle } : {} } }));
+    ws.onmessage = async (ev) => {
+      const raw = typeof ev.data === "string" ? ev.data : ev.data instanceof Blob ? await ev.data.text() : new TextDecoder().decode(ev.data);
+      let m; try { m = JSON.parse(raw); } catch { return; }
+      if (m.setupComplete && !pronto) { pronto = true; clearTimeout(tempo); ok(); }
+      tratarMsgLive(m);
+    };
+    ws.onclose = (ev) => {
+      clearTimeout(tempo);
+      if (!pronto) return erro(new Error(`conexão recusada (${ev.code}) ${ev.reason || ""}`.trim()));
+      if (live.ws === ws) aoCairLive(ev);
+    };
+  });
+}
+
+async function iniciarLive() {
+  status("Conectando ao vivo…", "lendo");
+  await conectarLive();
+  live.ativo = true;
+  pararOuvir(true); pararFala(); clearTimeout(timer);
+  await ligarMicLive();
+  iniciarVideoLive();
+  status("Ao vivo 🔴", "ok");
+  enviarTextoLive(`(O ${cfg.nome} acabou de abrir o app. Cumprimenta ele em 1 frase curta e diz que tá vendo a tela.)`, true, true);
+}
+
+function reiniciarLive() {
+  const eraAtivo = live.ativo;
+  live.handle = null;                       // config nova = sessão nova
+  encerrarLive();
+  if (cfg.aoVivo) iniciarLive().catch((e) => { status("Ao vivo indisponível, modo clássico", "pausado"); iniciarClassico(); console.warn(e); });
+  else if (eraAtivo) iniciarClassico();
+}
+
+function encerrarLive() {
+  live.ativo = false;
+  clearInterval(live.timerVideo);
+  try { live.proc?.disconnect(); live.micCtx?.close(); } catch {}
+  live.micStream?.getTracks().forEach((t) => t.stop());
+  live.micCtx = live.proc = live.micStream = null;
+  pararAudioLive();
+  const ws = live.ws; live.ws = null;
+  try { ws?.close(); } catch {}
+}
+
+async function aoCairLive(ev) {
+  if (!live.ativo || live.reconectando) return;
+  live.falhas = live.falhas.filter((t) => Date.now() - t < 60000);
+  if (live.falhas.length >= 4) { status("Ao vivo caiu, modo clássico", "erro"); encerrarLive(); iniciarClassico(); return; }
+  live.falhas.push(Date.now());
+  live.reconectando = true;
+  status("Reconectando ao vivo…", "pausado");
+  try { await conectarLive(); status("Ao vivo 🔴", "ok"); }
+  catch (e) { console.warn("reconexão falhou", e.message); setTimeout(() => { live.reconectando = false; aoCairLive(); }, 1500); return; }
+  live.reconectando = false;
+}
+
+// ---- microfone -> PCM 16 kHz ----
+async function ligarMicLive() {
+  live.micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 } });
+  let ctx;
+  try { ctx = new AudioContext({ sampleRate: 16000 }); } catch { ctx = new AudioContext(); }
+  live.micCtx = ctx;
+  const fonte = ctx.createMediaStreamSource(live.micStream);
+  const proc = ctx.createScriptProcessor(2048, 1, 1);
+  const passo = ctx.sampleRate / 16000;
+  proc.onaudioprocess = (e) => {
+    if (!live.ativo || live.mudo || pausado || live.reconectando) return;
+    const d = e.inputBuffer.getChannelData(0);
+    const n = Math.floor(d.length / passo), pcm = new Int16Array(n);
+    for (let i = 0; i < n; i++) pcm[i] = Math.max(-1, Math.min(1, d[Math.floor(i * passo)])) * 0x7fff;
+    enviarLive({ realtimeInput: { audio: { data: b64DeBytes(new Uint8Array(pcm.buffer)), mimeType: "audio/pcm;rate=16000" } } });
+  };
+  fonte.connect(proc); proc.connect(ctx.destination);
+  live.proc = proc;
+  btnMic.setAttribute("aria-pressed", "true");
+}
+function alternarMudoLive() {
+  live.mudo = !live.mudo;
+  btnMic.setAttribute("aria-pressed", String(!live.mudo));
+  btnMic.textContent = live.mudo ? "🔇" : "🎤";
+  status(live.mudo ? "Microfone mudo (ao vivo)" : "Ao vivo 🔴", live.mudo ? "pausado" : "ok");
+  if (live.mudo) enviarLive({ realtimeInput: { audioStreamEnd: true } });
+}
+
+// ---- vídeo da TV: 1 quadro/s quando muda, senão a cada 4 s ----
+function iniciarVideoLive() {
+  clearInterval(live.timerVideo);
+  live.timerVideo = setInterval(() => {
+    if (!live.ativo || pausado || live.reconectando || live.ws?.readyState !== 1) return;
+    const mudou = mudouBastante();
+    if (!mudou && Date.now() - live.ultimoVideo < 4000) return;
+    const img = capturar(1024, 0.7);
+    if (!img) return;
+    live.ultimoVideo = Date.now();
+    const mini = $("miniatura"); if (mini) { mini.src = img; mini.hidden = false; }
+    enviarLive({ realtimeInput: { video: { data: img.split(",")[1], mimeType: "image/jpeg" } } });
+  }, 1000);
+}
+
+// ---- texto digitado ----
+function enviarTextoLive(texto, silencioso = false, semCartao = false) {
+  if (!semCartao && !silencioso) mostrarConversa(texto, "…", []);
+  if (!silencioso) { live.ouvido = texto; live.fala = ""; }
+  enviarLive({ clientContent: { turns: [{ role: "user", parts: [{ text: texto }] }], turnComplete: true } });
+}
+
+// ---- áudio do Parça (PCM 24 kHz) ----
+function tocarPcmLive(b64, mime) {
+  if (pausado || !cfg.voz) return;
+  const taxa = Number(/rate=(\d+)/.exec(mime || "")?.[1]) || 24000;
+  if (!live.outCtx) live.outCtx = new AudioContext();
+  const ctx = live.outCtx;
+  if (ctx.state === "suspended") ctx.resume();
+  const bin = atob(b64), n = bin.length >> 1, buf = ctx.createBuffer(1, n, taxa), canal = buf.getChannelData(0);
+  for (let i = 0; i < n; i++) { let v = bin.charCodeAt(2 * i) | (bin.charCodeAt(2 * i + 1) << 8); if (v & 0x8000) v -= 0x10000; canal[i] = v / 0x8000; }
+  const src = ctx.createBufferSource();
+  src.buffer = buf; src.connect(ctx.destination);
+  const inicio = Math.max(ctx.currentTime + 0.03, live.prox);
+  src.start(inicio);
+  live.prox = inicio + buf.duration;
+  live.sons.push(src);
+  src.onended = () => { live.sons = live.sons.filter((x) => x !== src); };
+}
+function pararAudioLive() {
+  for (const s of live.sons) { try { s.stop(); } catch {} }
+  live.sons = []; live.prox = 0;
+}
+
+// ---- mensagens do Gemini ----
+async function tratarMsgLive(m) {
+  if (m.sessionResumptionUpdate?.resumable && m.sessionResumptionUpdate.newHandle) live.handle = m.sessionResumptionUpdate.newHandle;
+  if (m.goAway) { aoCairLive(); return; }
+  if (m.toolCall) return responderFerramentas(m.toolCall);
+  const sc = m.serverContent;
+  if (!sc) return;
+  if (sc.interrupted) pararAudioLive();
+  if (sc.inputTranscription?.text) live.ouvido += sc.inputTranscription.text;
+  if (sc.outputTranscription?.text) live.fala += sc.outputTranscription.text;
+  for (const p of sc.modelTurn?.parts || []) if (p.inlineData?.data) tocarPcmLive(p.inlineData.data, p.inlineData.mimeType);
+  if (live.fala || live.ouvido) mostrarConversa(live.ouvido.trim() || "🎥 (comentando a tela)", live.fala.trim() || "…", live.fontes, live.fontes.length > 0);
+  if (sc.turnComplete) {
+    if (live.fala.trim()) conversa.push({ role: "user", content: live.ouvido.trim() || "(tela)" }, { role: "assistant", content: live.fala.trim() });
+    conversa = conversa.slice(-16);
+    live.ouvido = ""; live.fala = ""; live.fontes = [];
+  }
+}
+
+async function responderFerramentas(tc) {
+  const respostas = [];
+  for (const fc of tc.functionCalls || []) {
+    if (fc.name !== "pesquisar_web") { respostas.push({ id: fc.id, name: fc.name, response: { erro: "função desconhecida" } }); continue; }
+    status("Pesquisando na internet…", "lendo");
+    try {
+      const r = await fetch("/api/buscar", { method: "POST", headers: headersIA(), body: JSON.stringify(fc.args || {}) });
+      const d = await r.json();
+      live.fontes = (d.resultados || []).slice(0, 3).map((x) => ({ titulo: x.titulo, url: x.url }));
+      respostas.push({ id: fc.id, name: fc.name, response: d.resultados?.length ? { consulta: d.consulta, resultados: d.resultados } : { erro: "nada encontrado; diga que não achou" } });
+    } catch { respostas.push({ id: fc.id, name: fc.name, response: { erro: "busca falhou" } }); }
+  }
+  enviarLive({ toolResponse: { functionResponses: respostas } });
+  status("Ao vivo 🔴", "ok");
+}
