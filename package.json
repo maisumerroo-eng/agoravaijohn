@@ -1,0 +1,7 @@
+{
+  "name": "gta-copiloto",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "node dev.js" },
+  "dependencies": { "@anthropic-ai/sdk": "^1.14.0" }
+}

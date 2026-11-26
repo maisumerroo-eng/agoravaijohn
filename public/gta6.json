@@ -1,0 +1,1842 @@
+{
+ "versao": "2026-11-26",
+ "fontes": [
+  "rockstargames.com",
+  "redbull.com",
+  "leonidainteractive.com",
+  "absolutegeeks.com",
+  "svg.com",
+  "mmoexp.com",
+  "powerpyx.com",
+  "gtabase.com",
+  "gamerant.com",
+  "notebookcheck.net",
+  "comicbook.com",
+  "gtaboom.com",
+  "beebom.com",
+  "leonihub.com",
+  "retrobroker.com",
+  "games.gg",
+  "kotaku.com",
+  "invenglobal.com",
+  "digit.in",
+  "omelete.com.br",
+  "ibtimes.co.uk",
+  "querobolsa.com.br",
+  "analyticsinsight.net"
+ ],
+ "itens": [
+  {
+   "tipo": "regiao",
+   "nome": "Leonida",
+   "texto": "Estado fictício onde o jogo se passa, inspirado na Flórida. Mapa maior que o do GTA V, com cidade, ilhas, pântanos, praias, interior agrícola e florestas.",
+   "tags": [
+    "mapa",
+    "estado",
+    "florida"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Vice City",
+   "texto": "Maior cidade de Leonida, inspirada em Miami. Visual: arranha-céus de vidro, prédios art déco em tons pastel, palmeiras, neon à noite, praias lotadas, iates e carros esportivos. Centro da vida noturna, clubes, lojas e golpes.",
+   "tags": [
+    "cidade",
+    "miami",
+    "praia",
+    "neon",
+    "noite"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Praias de Vice City",
+   "texto": "Vice Beach, Ocean Beach e Washington Beach. Visual: orla com hotéis art déco, neon, calçadão e areia (estilo Miami Beach). Em Vice Beach as bolas de vôlei ficam nas guaritas dos salva-vidas; jogar uma em alguém começa briga.",
+   "tags": [
+    "praia",
+    "vice beach",
+    "ocean beach",
+    "art deco",
+    "neon"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Leonida Keys",
+   "texto": "Arquipélago no sul inspirado nas Florida Keys. Visual: ilhas baixas ligadas por pontes longas sobre água azul-turquesa, casas de palafita, marinas, barcos. É onde vivem Jason e o pessoal do tráfico de barco.",
+   "tags": [
+    "ilhas",
+    "pontes",
+    "barco",
+    "keys",
+    "agua"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Key Lento",
+   "texto": "Ilha das Keys onde a história começa (cerca de 1/5 do jogo). Visual: uma highway principal com lojas, bares e casas dos dois lados, mar em volta. Bares Rusty Anchor e Cheeky Mutineer. Dinheiro some rápido aqui: gaste em armas e modificações.",
+   "tags": [
+    "keys",
+    "inicio",
+    "ilha",
+    "key lento"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Grassrivers",
+   "texto": "Pântano inspirado nos Everglades. Visual: capim alto alagado, manguezais, airboats, jacarés e estradas retas sobre o charco. Cuidado com jacarés na água.",
+   "tags": [
+    "pantano",
+    "everglades",
+    "jacare",
+    "airboat"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Port Gellhorn",
+   "texto": "Cidade praiana decadente inspirada na região de Panama City/Panhandle. Visual: motéis velhos, parque de diversões, fábricas, praia de spring break gasta. Rockstar chama de 'costa esquecida'.",
+   "tags": [
+    "praia",
+    "panhandle",
+    "motel",
+    "decadente"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Ambrosia",
+   "texto": "Cidade industrial do interior inspirada em Clewiston, centro do açúcar da Flórida. Visual: refinaria de açúcar com chaminés, canaviais, campos planos, motoqueiros e trailers.",
+   "tags": [
+    "interior",
+    "acucar",
+    "refinaria",
+    "motoqueiros"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Mount Kalaga (parque nacional)",
+   "texto": "Montanha enorme com florestas acidentadas, rios e lagos (Lummox County). Lugar de caça, off-road, ciclismo, meditação e escalada. Fauna: cervos, raposas e pumas (relatado).",
+   "tags": [
+    "floresta",
+    "caca",
+    "pesca",
+    "offroad",
+    "norte"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Lake Leonida",
+   "texto": "Grande lago cercado de fazendas, inspirado no Lake Okeechobee. Bom pra pesca. Fontes divergem se fica em Leonard County ou perto de Ambrosia.",
+   "tags": [
+    "lago",
+    "pesca",
+    "okeechobee",
+    "fazendas"
+   ]
+  },
+  {
+   "tipo": "personagem",
+   "nome": "Lucia Caminos",
+   "texto": "Protagonista. Acabou de sair da Penitenciária de Leonida, aprendeu a lutar com o pai. Quer uma vida melhor pra ela e a mãe.",
+   "tags": [
+    "protagonista",
+    "lucia"
+   ]
+  },
+  {
+   "tipo": "personagem",
+   "nome": "Jason Duval",
+   "texto": "Protagonista. Ex-militar, faz serviços pra traficantes nas Keys. Quer uma vida tranquila, mas se envolve com Lucia em crimes.",
+   "tags": [
+    "protagonista",
+    "jason"
+   ]
+  },
+  {
+   "tipo": "personagem",
+   "nome": "Cal Hampton",
+   "texto": "Amigo e parceiro de Jason nas Keys. Teórico da conspiração, vive escutando rádio da polícia e na internet.",
+   "tags": [
+    "keys",
+    "jason"
+   ]
+  },
+  {
+   "tipo": "personagem",
+   "nome": "Boobie Ike",
+   "texto": "Lenda de Vice City. Dono de imóveis, clube de strip e da gravadora Only Raw Records.",
+   "tags": [
+    "vice city",
+    "musica",
+    "negocios"
+   ]
+  },
+  {
+   "tipo": "personagem",
+   "nome": "Dre'Quan Priest",
+   "texto": "Sócio de Boobie, manda na parte musical da Only Raw Records e quer lançar a dupla Real Dimez.",
+   "tags": [
+    "musica",
+    "vice city"
+   ]
+  },
+  {
+   "tipo": "personagem",
+   "nome": "Real Dimez",
+   "texto": "Dupla de rap (Bae-Luxe e Roxy) que estourou nas redes; contratadas da Only Raw Records.",
+   "tags": [
+    "musica",
+    "rap",
+    "redes sociais"
+   ]
+  },
+  {
+   "tipo": "personagem",
+   "nome": "Raul Bautista",
+   "texto": "Assaltante de banco experiente e carismático, recruta gente pra golpes cada vez mais arriscados.",
+   "tags": [
+    "assalto",
+    "banco"
+   ]
+  },
+  {
+   "tipo": "personagem",
+   "nome": "Brian Heder",
+   "texto": "Traficante veterano das Keys que dá casa a Jason em troca de trabalho. Mora com a esposa Lori.",
+   "tags": [
+    "keys",
+    "trafico",
+    "jason"
+   ]
+  },
+  {
+   "tipo": "dica",
+   "nome": "Fugir da polícia (padrão GTA)",
+   "texto": "Quebre a linha de visão: becos, túneis, garagens, embaixo de pontes. Trocar de carro longe dos policiais e ficar parado escondido ajuda as estrelas sumirem.",
+   "tags": [
+    "policia",
+    "procurado",
+    "estrelas",
+    "fuga"
+   ]
+  },
+  {
+   "tipo": "dica",
+   "nome": "Dinheiro no começo (padrão GTA)",
+   "texto": "Missões da história dão a maior parte do dinheiro no início. Não gaste tudo em carro: guarde para armas, armadura e munição antes de missões grandes.",
+   "tags": [
+    "dinheiro",
+    "economia",
+    "inicio"
+   ]
+  },
+  {
+   "tipo": "dica",
+   "nome": "Combate (padrão GTA)",
+   "texto": "Use cobertura sempre, mire na cabeça, recarregue atrás de muros. Antes de missão pesada, encha vida e armadura.",
+   "tags": [
+    "combate",
+    "tiroteio",
+    "armadura"
+   ]
+  },
+  {
+   "tipo": "dica",
+   "nome": "Direção (padrão GTA)",
+   "texto": "Freio de mão em curvas fechadas. Motos são ótimas pra fugir em trânsito; barcos e pântanos despistam viaturas.",
+   "tags": [
+    "direcao",
+    "carro",
+    "moto",
+    "fuga"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Volta a Vice City",
+   "texto": "Vice City apareceu no primeiro GTA (1997) e em GTA Vice City (2002), passado em 1986. GTA VI traz a cidade de volta nos dias de hoje.",
+   "tags": [
+    "vice city",
+    "historia da serie"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Primeira protagonista mulher na era 3D",
+   "texto": "Lucia é a primeira protagonista mulher jogável da série desde os GTAs 2D.",
+   "tags": [
+    "lucia"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Trailer recordista",
+   "texto": "O 1º trailer (dez/2023) saiu um dia antes por causa de vazamento e bateu recorde de visualizações em 24h no YouTube para vídeo que não é clipe musical.",
+   "tags": [
+    "trailer",
+    "recorde"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Músicas dos trailers",
+   "texto": "Trailer 1 usa 'Love Is a Long Road' (Tom Petty). Trailer 2 usa 'Hot Together' (The Pointer Sisters).",
+   "tags": [
+    "musica",
+    "trailer"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Lançamento adiado",
+   "texto": "O jogo foi anunciado para 2025, depois adiado para maio de 2026 e lançado em 19 de novembro de 2026.",
+   "tags": [
+    "lancamento"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Florida Man",
+   "texto": "Os clipes de 'redes sociais' dos trailers satirizam o meme 'Florida Man', das notícias bizarras da Flórida.",
+   "tags": [
+    "humor",
+    "redes sociais",
+    "florida"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Art déco de Miami",
+   "texto": "O distrito art déco de Miami Beach tem centenas de prédios dos anos 1930 tombados — base do visual pastel e neon de Vice City.",
+   "tags": [
+    "miami",
+    "arquitetura",
+    "vice city"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Everglades de verdade",
+   "texto": "Os Everglades são o maior ecossistema subtropical selvagem dos EUA e o único lugar onde jacarés e crocodilos vivem juntos.",
+   "tags": [
+    "everglades",
+    "grassrivers",
+    "jacare"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Seven Mile Bridge",
+   "texto": "As Florida Keys são ligadas pela Overseas Highway, com a Seven Mile Bridge (~11 km) — inspiração para as pontes longas das Leonida Keys.",
+   "tags": [
+    "keys",
+    "ponte"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Cidade mais doce",
+   "texto": "Clewiston, inspiração de Ambrosia, se chama 'America's Sweetest Town' por causa da indústria de açúcar.",
+   "tags": [
+    "ambrosia",
+    "acucar"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Condados de Leonida",
+   "texto": "Divisão oficial do mapa: Vice-Dale County (Vice City), Leonard County (subúrbios), Kelly County (Port Gellhorn, Ambrosia), Mariana County (Grassrivers, Keys, Capri), Lummox County (Mount Kalaga). O mapa começa coberto por névoa preta e revela ao explorar.",
+   "tags": [
+    "mapa",
+    "condado",
+    "nevoa"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Distritos de Vice City",
+   "texto": "Little Cuba, Crosstown, Downtown, Salton, Bayside, Stockyard, Decor District. Ilhas ricas a leste: Rialto Islands (com Vespucci Island), Starfish Island, Dalton Island, Leaf Links. Também o Aeroporto Internacional de Vice City.",
+   "tags": [
+    "vice city",
+    "bairros",
+    "ilhas",
+    "aeroporto"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Little Cuba (Vice City)",
+   "texto": "Bairro cubano de Vice City (inspiração: Little Havana, Miami). Lá fica Yasmani, receptador que paga bem por joias e notas marcadas.",
+   "tags": [
+    "vice city",
+    "receptador",
+    "joias",
+    "little havana"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "La Pearl (Vice City)",
+   "texto": "Bairro com trem elevado, equivalente a Little Haiti de Miami.",
+   "tags": [
+    "vice city",
+    "trem"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Sahara Arena e clube 919",
+   "texto": "Arena de Vice City e a casa noturna 919, ponto de vida noturna.",
+   "tags": [
+    "vice city",
+    "noite",
+    "clube"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Leonida Keys - lugares",
+   "texto": "Gambit Bay, Maroon Key, Permit Keys, Abismo Key (bonitas, pouco conteúdo), Southwind, Corsair Key, Riquezas Keys. Volta às Keys depois de sair: uns 10 min de carro.",
+   "tags": [
+    "keys",
+    "ilhas"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Mike Zero Air Station",
+   "texto": "Base aérea no sudoeste das Keys. Entrar dá 4 estrelas de procurado, mas é um dos poucos lugares pra pegar um jato.",
+   "tags": [
+    "keys",
+    "jato",
+    "base militar",
+    "procurado"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Casa do Jason (Keys)",
+   "texto": "Esconderijo inicial. Dinheiro guardado embaixo das tábuas soltas do quarto. Halteres na frente da casa. Dormir aqui avança o dia. Carros: Ganado na frente, Bombora no deck.",
+   "tags": [
+    "keys",
+    "casa",
+    "esconderijo",
+    "jason"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Leonard County",
+   "texto": "Subúrbio residencial com centros comerciais. Cidades: Waning Sands (minigolfe Frontier Adventure Golf e outlet ao ar livre) e Bellville (residencial). Também Vinewood Beach e Leith River.",
+   "tags": [
+    "suburbio",
+    "minigolfe",
+    "outlet",
+    "waning sands",
+    "bellville"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Kelly County",
+   "texto": "Interior 'backwoods'. Inclui Port Gellhorn, Ambrosia, Draper Island, Wild Hog Point (aviões), Emerald Springs (parque temático) e Manifest Canyon. Muitos acham a melhor região do mapa.",
+   "tags": [
+    "interior",
+    "port gellhorn",
+    "ambrosia",
+    "avioes",
+    "parque"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Gellhorn International Raceway",
+   "texto": "Autódromo de Port Gellhorn, com drag strip e pista de motocross.",
+   "tags": [
+    "port gellhorn",
+    "corrida",
+    "autodromo"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Refinaria de Ambrosia",
+   "texto": "Allied Crystal Sugar Refinery, maior empregadora de Ambrosia. Cidade dominada pela gangue de motoqueiros The Final Chapter. Bar de motoqueiros Thirsty Wolf.",
+   "tags": [
+    "ambrosia",
+    "refinaria",
+    "motoqueiros",
+    "final chapter"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Watson Bay",
+   "texto": "Cidade de pântano inspirada na Louisiana, com traficantes, boas lojas de roupa e vista do Pelican River.",
+   "tags": [
+    "grassrivers",
+    "mariana",
+    "roupas"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Capri",
+   "texto": "Uma das cidades mais ricas, a oeste em Mariana County: carros caros, lojas finas, missões principais. Boa pra assaltos.",
+   "tags": [
+    "rica",
+    "assalto",
+    "mariana",
+    "carros"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Hamlet",
+   "texto": "Vila do pântano, sede da gangue M7. Perigosa.",
+   "tags": [
+    "grassrivers",
+    "gangue",
+    "perigo"
+   ]
+  },
+  {
+   "tipo": "regiao",
+   "nome": "Lummox County - lugares",
+   "texto": "Millport (industrial), Lake Tallaloko (comunidade de montanha), Kalaga Reservoir, Partridge Bay, Grayson.",
+   "tags": [
+    "mount kalaga",
+    "montanha",
+    "lago"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Dinheiro no bolso",
+   "texto": "Morrer ou ser preso faz perder o dinheiro que está com você. Guarde em casa (tábuas soltas no quarto do Jason) até ter banco.",
+   "tags": [
+    "dinheiro",
+    "morte",
+    "preso"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Conta bancária",
+   "texto": "Liberada na missão 'Buck Me' (1-2 h de jogo). Conta compartilhada entre Jason e Lucia; hospital e prisão não mexem no saldo. Depósito só em caixa eletrônico; limite de depósito sobe com a história.",
+   "tags": [
+    "banco",
+    "dinheiro",
+    "caixa eletronico"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Stats: Saúde, Stamina, Focus",
+   "texto": "Saúde (coração rosa), Stamina (raio azul-verde), Focus (olho roxo = tempo de câmera lenta). Musculação sobe Saúde; corrida, bike, caiaque e esteira sobem Stamina; pesca, sinuca, golfe e estande de tiro sobem Focus.",
+   "tags": [
+    "stats",
+    "vida",
+    "stamina",
+    "focus",
+    "treino"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Buffs de comida e sono",
+   "texto": "Comer, dormir e tomar banho dão buffs temporários. Maçã + água sobe as três barras. Alimentar Dolores, a cobra do Jason, dá um buff pequeno de Focus.",
+   "tags": [
+    "comida",
+    "buff",
+    "dormir",
+    "dolores"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "App de fitness",
+   "texto": "Cada personagem tem um app. Feche o anel e coma proteína/shake pra fixar ganhos; abre ~1 vez por dia no jogo. Treinar em dupla treina os dois. Na esteira/bike, mantenha o cursor na zona rosa.",
+   "tags": [
+    "academia",
+    "fitness",
+    "treino"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Focus Mode",
+   "texto": "Aperta os dois analógicos. Cores: vermelho = inimigo/arma/explosivo, amarelo = item interativo, verde = dinheiro, roxo = drogas/estoque ilícito. Portas brancas abrem; vermelhas têm alarme. Acha códigos de cofre e rastros de animais.",
+   "tags": [
+    "focus",
+    "cores",
+    "cofre",
+    "portas"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Combat Focus",
+   "texto": "Mirando, aperta os dois analógicos: câmera lenta mostrando pontos fracos. Libera no Capítulo 1. Com arma dura pouco.",
+   "tags": [
+    "combate",
+    "focus",
+    "mira"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Perfil Criminal",
+   "texto": "Cinco níveis: Professional, Hardened, Violent, Psycho, Irredeemable. Definido pelas mortes e jeito de agir. Professional/Hardened: nocautes não letais enchem o Focus. Violent/Psycho: headshots enchem. Psycho não pode se render. Irredeemable é permanente.",
+   "tags": [
+    "perfil",
+    "karma",
+    "mortes",
+    "focus"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Hit markers",
+   "texto": "Branco = inimigo ainda luta; amarelo = fora de combate; vermelho = morto.",
+   "tags": [
+    "combate",
+    "mira"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Relação Jason e Lucia",
+   "texto": "Coração entre os retratos, 4 níveis. Dançar e dar as mãos sobe; ignorar ligações ou falhar missões baixa.",
+   "tags": [
+    "relacionamento",
+    "jason",
+    "lucia"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Como a polícia te acha",
+   "texto": "Polícia não aparece no minimapa; testemunhas e câmeras te entregam. Pistas: aparência, roupa, arma visível, carro, CCTV, parceiro. Tiros atraem polícia.",
+   "tags": [
+    "policia",
+    "procurado",
+    "testemunha",
+    "cctv"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Despistar a polícia",
+   "texto": "Use chapéu/bandana no crime e tire depois; troque de roupa (dá pra guardar roupa no porta-malas); guarde a arma; troque de carro; destrua o CCTV da sala dos fundos; separe do parceiro. Derrube o celular de testemunha (Quadrado/X).",
+   "tags": [
+    "policia",
+    "fuga",
+    "roupa",
+    "disfarce"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Estrelas de procurado",
+   "texto": "Contorno branco = sabem do crime, não quem foi; branco sólido = te viram; cinza = te perderam; contorno vermelho = área em alerta mas sua aparência não bate; vermelho sólido = bate. No mapa de pausa: círculo azul = não te ligaram ao crime, vermelho = ligaram.",
+   "tags": [
+    "estrelas",
+    "procurado",
+    "policia"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Helicóptero e perseguição",
+   "texto": "Helicóptero recua se levar tiro suficiente. Estourar um ou dois pneus faz perseguidores rodarem.",
+   "tags": [
+    "policia",
+    "helicoptero",
+    "perseguicao"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Silenciador",
+   "texto": "Melhor primeira compra: reduz a atenção da polícia. Ammu-Nation com silenciador logo depois do tutorial nas Keys.",
+   "tags": [
+    "arma",
+    "silenciador",
+    "ammu-nation"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Armas próprias x pegas",
+   "texto": "Compradas na Ammu-Nation são suas: voltam pelo armário (locker) ou porta-malas. Pegas de inimigo podem ser perdidas se largar, sair do jogo ou ser preso. Ícone amarelo/dourado = arma única que desbloqueia de vez.",
+   "tags": [
+    "arma",
+    "inventario"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Controles de combate",
+   "texto": "L2/LT mira; analógico direito troca pra mira em 1ª pessoa (só com mira óptica); D-pad esquerda troca de ombro. Corpo a corpo: Quadrado/X empurra/bate; R2/RT agarra, de novo arremessa.",
+   "tags": [
+    "controles",
+    "mira",
+    "briga"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Itens de cura",
+   "texto": "Pílula Zombix (cura mais com vida baixa, até 5) e seringa de Adrenalina (sobe as três barras acima do normal). Pela roda de armas (L1/LB).",
+   "tags": [
+    "cura",
+    "vida",
+    "adrenalina"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Assaltos",
+   "texto": "Principal fonte de renda; quase tudo pode ser assaltado desde o início. Veja no mapa o valor e a segurança antes. Baixa segurança: dá sozinho. Média/alta: vá em dupla. Muitos lugares têm porta dos fundos; snap gun entra sem alarme.",
+   "tags": [
+    "assalto",
+    "roubo",
+    "dinheiro"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Cofres",
+   "texto": "Código aleatório por local, num bilhete por perto (Focus ajuda a achar). Também abre com ferramenta ou bomba adesiva.",
+   "tags": [
+    "cofre",
+    "assalto",
+    "codigo"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Bancos e dye pack",
+   "texto": "Notas de banco e casas de empréstimo têm dye pack que explode ao sair do prédio. Precisa do dye pack jammer, só no Capítulo 3.",
+   "tags": [
+    "banco",
+    "assalto",
+    "dye pack"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Bolsas de saque",
+   "texto": "2 por personagem; porta-malas leva várias; vans/caminhões até 8; moto nenhuma. Passar ao parceiro: D-pad direita + Círculo/B. Morrer com bolsas = perde tudo.",
+   "tags": [
+    "saque",
+    "bolsa",
+    "assalto"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Receptadores",
+   "texto": "Joias, narcóticos e notas marcadas vão pra receptadores. Yasmani (Little Cuba) paga bem por joias e notas marcadas; Tyrone por narcóticos. Em dupla: um vende, outro despista a polícia.",
+   "tags": [
+    "receptador",
+    "vender",
+    "joias",
+    "drogas"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Roubar carros",
+   "texto": "Segure cima no D-pad pra ver segurança, preço de venda e custo de registro. Rastreador padrão impede modificar antes de registrar. Rastreador avançado chama a polícia (fontes divergem: se afastar do local ou parar). Carros keyless precisam de chave clonadora, liberada depois.",
+   "tags": [
+    "carro",
+    "roubo",
+    "rastreador"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Pay 'n' Spray",
+   "texto": "Registra o carro (taxa menor pra carro pior) e faz pintura básica.",
+   "tags": [
+    "carro",
+    "registro",
+    "pintura"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Garagens",
+   "texto": "Depois de sair de Key Lento dá pra comprar quase uma dezena. Guardam carros de graça, loadout de armas e entrega de mercadoria ilícita. Moses (Capítulo 2) abre mais espaço. App Scooter Bros chama carro registrado.",
+   "tags": [
+    "garagem",
+    "carro",
+    "esconderijo"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Carro: dicas rápidas",
+   "texto": "Pedágio $5 (grátis em carro roubado). Carro capotado: ande do lado com analógico pra frente, segure Quadrado/X pra empurrar. D-pad baixo mostra combustível/condição. Buzina: analógico esquerdo.",
+   "tags": [
+    "carro",
+    "pedagio",
+    "combustivel"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Viagem rápida",
+   "texto": "Não tem teleporte pelo mapa. App RydeMe chama carro; +$100 leva rápido. Ônibus e trens têm horário. Trocar de personagem é o jeito mais rápido de 'viajar'.",
+   "tags": [
+    "viagem",
+    "fast travel",
+    "onibus",
+    "trem",
+    "rydeme"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Mapa: prédios e missões",
+   "texto": "Prédio azul-escuro no mapa tem interior; azul-claro é cenário. Missão rosa com letra preta = principal; preto com letra rosa = opcional; roxo = tarefa pequena. Segurar D-pad baixo mostra marcos e atividades.",
+   "tags": [
+    "mapa",
+    "missao",
+    "predio"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Dia e noite",
+   "texto": "Dias bem mais longos que nos GTAs anteriores. Lojas fecham à noite; algumas missões só em certos horários. Hora no celular (D-pad cima).",
+   "tags": [
+    "horario",
+    "noite",
+    "lojas"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Interação com NPCs",
+   "texto": "L2/LT perto de alguém mostra opções; R1/RB + L2/LT é abordagem agressiva. Se pedirem pra sair, vá antes que chamem a polícia.",
+   "tags": [
+    "npc",
+    "interacao"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Visual e roupas",
+   "texto": "Lojas da mesma marca têm o mesmo estoque. Salão: cortes e barba pro Jason; maquiagem e cabelo pra Lucia. Fone de ouvido (loja de eletrônicos) libera rádio a pé.",
+   "tags": [
+    "roupa",
+    "salao",
+    "radio"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Cheats",
+   "texto": "61 códigos, liberados após a história e desafios. Celular (cima), segure L1, aperte R1 e a sequência no D-pad. Desativa troféus e salvamento.",
+   "tags": [
+    "cheat",
+    "codigo"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Mergulho de tesouro",
+   "texto": "Key Lento: detector de metais embaixo d'água. Cuidado com tubarões. Há cavernas e naufrágios.",
+   "tags": [
+    "mergulho",
+    "tesouro",
+    "keys",
+    "tubarao"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Pesca",
+   "texto": "Desafios de pesca nas Keys; Lake Leonida também é bom. Sobe Focus.",
+   "tags": [
+    "pesca",
+    "keys",
+    "lago",
+    "focus"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Pedidos da Shirley",
+   "texto": "Vizinha do Jason nas Keys: pequenas tarefas no começo do jogo.",
+   "tags": [
+    "keys",
+    "missao secundaria"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Drone Trials",
+   "texto": "Desafios de drone em Vice-Dale, Leonard e Kelly County.",
+   "tags": [
+    "drone",
+    "desafio"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Corridas",
+   "texto": "Rua em Vice City; Boone Speedway (Mariana); Mud Club (corrida na lama em Kelly, muito elogiada); off-road em Kelly e Lummox; ciclismo em Lummox.",
+   "tags": [
+    "corrida",
+    "lama",
+    "offroad",
+    "bike"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Golfe e sinuca",
+   "texto": "Frontier Adventure Golf em Waning Sands. Golfe e sinuca sobem Focus.",
+   "tags": [
+    "golfe",
+    "minigolfe",
+    "sinuca",
+    "focus"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Estande de tiro",
+   "texto": "Estande em Rodgers Ranch ajuda a maximizar o Focus.",
+   "tags": [
+    "tiro",
+    "focus"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Caça",
+   "texto": "Mr. Mangrove no pântano de Mariana; caça para Bret Vogel em Lummox. Cervos, raposas e pumas em Mount Kalaga.",
+   "tags": [
+    "caca",
+    "animais",
+    "mount kalaga",
+    "pantano"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Meditação e escalada",
+   "texto": "Meditar e escalar o Mount Kalaga (Lummox County).",
+   "tags": [
+    "meditacao",
+    "escalada",
+    "mount kalaga"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Airboat",
+   "texto": "Principal transporte da Grassrivers, bom pra fugir pelos canais. Patrulhas contra caçadores ilegais (relatado).",
+   "tags": [
+    "airboat",
+    "pantano",
+    "grassrivers"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Lazer",
+   "texto": "Parque Emerald Springs (Kelly), Vice City Casino, Delights Cabaret (Kelly), outlet de Waning Sands.",
+   "tags": [
+    "lazer",
+    "cassino",
+    "parque"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Serviços de gangue",
+   "texto": "Roubar carros pro Randy e derrubar operações Kitty Litter pro Tyrone (Vice); entregar mercadoria no trailer do Dunk e roubar carros pro Moses (Kelly).",
+   "tags": [
+    "missao secundaria",
+    "gangue",
+    "carro"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Esconderijos de gangue",
+   "texto": "San4San e Guardia Brothers (Vice), The Final Chapter e Kolt & Associates (Kelly), Kingfishers e La Polilla Negra (Mariana/Keys), M7 (Hamlet). Tiro perto chama a polícia, mas ela chega mais devagar.",
+   "tags": [
+    "gangue",
+    "esconderijo",
+    "combate"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Garage sales",
+   "texto": "Balões marcam vendas de garagem com itens raros.",
+   "tags": [
+    "compras",
+    "itens"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Barco do Michael",
+   "texto": "O barco do Michael (GTA V) está atracado perto da casa do Jason; o GPS mostra mapa de Los Santos.",
+   "tags": [
+    "easter egg",
+    "gta v",
+    "keys"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Toque Windchimes",
+   "texto": "O toque de celular do Michael (GTA V) está nas opções de toque.",
+   "tags": [
+    "easter egg",
+    "gta v",
+    "celular"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Referências a Red Dead e GTA IV",
+   "texto": "Livro no Jacob's Tavern (Millport) sobre um cowboy de New Austin (Red Dead); livro na mesa do Jason cita Liberty City.",
+   "tags": [
+    "easter egg",
+    "red dead",
+    "gta iv"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Olho do Chiliad",
+   "texto": "Caminhão com o olho do Monte Chiliad, mensagens de conspiração e QR code.",
+   "tags": [
+    "easter egg",
+    "misterio",
+    "conspiracao"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Casa do Dexter",
+   "texto": "A casa de Dexter Morgan (série Dexter, passada em Miami) aparece em Vice-Dale, perto da loja Top Fun Drones. Visível, sem entrar.",
+   "tags": [
+    "easter egg",
+    "serie",
+    "vice city"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Gnomos e Mr. Raspberry Jam",
+   "texto": "Os gnomos e o Mr. Raspberry Jam do GTA V aparecem como lembrancinhas, principalmente nas Keys.",
+   "tags": [
+    "easter egg",
+    "gta v",
+    "keys"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "OVNI de Port Gellhorn",
+   "texto": "Entre 2h e 3h do jogo, perto de Port Gellhorn, um OVNI abduz uma mulher; chegar perto puxa você.",
+   "tags": [
+    "misterio",
+    "ovni",
+    "port gellhorn",
+    "noite"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Laboratório secreto",
+   "texto": "Código 2314 no teclado de uma instalação de pesquisa perto de Port Gellhorn; o elevador leva a um laboratório com puzzle que libera um alienígena cinza.",
+   "tags": [
+    "misterio",
+    "alien",
+    "port gellhorn",
+    "segredo"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Skunk Ape",
+   "texto": "No pântano ao sul de Cottonmouth Lake ou Watson Bay, saindo do carro dá pra ouvir o rugido do Skunk Ape (o 'pé-grande' da Flórida).",
+   "tags": [
+    "misterio",
+    "pantano",
+    "criptideo"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Fantasma de Leonard County",
+   "texto": "Aparição de uma garota fantasma no estilo de O Chamado.",
+   "tags": [
+    "misterio",
+    "fantasma",
+    "leonard"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Mr. Mangrove",
+   "texto": "Avistamentos de Mr. Mangrove são um segredo nos pântanos de Mariana County.",
+   "tags": [
+    "misterio",
+    "pantano"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Bob Esponja",
+   "texto": "Um ponto de ônibus parece a casa-abacaxi do Bob Esponja.",
+   "tags": [
+    "easter egg",
+    "humor"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Preso no videogame",
+   "texto": "Garagem em Bellville com um homem que acha estar preso num videogame. Nadar longe demais pode trazer um cachorro de jet ski.",
+   "tags": [
+    "easter egg",
+    "humor",
+    "bellville"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Skunk Ape de verdade",
+   "texto": "Na Flórida real, o Skunk Ape é uma lenda de criatura peluda e fedida dos Everglades.",
+   "tags": [
+    "florida",
+    "lenda",
+    "pantano"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Mapa da Rockstar",
+   "texto": "No dia do lançamento a Rockstar liberou um mapa de Leonida pra imprimir.",
+   "tags": [
+    "mapa",
+    "lancamento"
+   ]
+  },
+  {
+   "tipo": "historia",
+   "nome": "Estrutura da história",
+   "texto": "Prólogo + 5 capítulos, 60 a 80 horas. Não tem replay de missão: salve manualmente no começo e no fim de cada capítulo. Alguns capítulos terminam em ponto sem retorno.",
+   "tags": [
+    "historia",
+    "capitulos",
+    "salvar"
+   ]
+  },
+  {
+   "tipo": "historia",
+   "nome": "Prólogo",
+   "texto": "Lucia conversa com o conselheiro da prisão sobre soltura antecipada.",
+   "tags": [
+    "prologo",
+    "lucia"
+   ],
+   "spoiler": true
+  },
+  {
+   "tipo": "historia",
+   "nome": "Capítulo 1 (Keys)",
+   "texto": "Jason nas Keys com Brian, Cal, Donnie e Kenton; Lucia sai da prisão (Coming Home). Missões: Gone Fishing, Gear Up, Unwanted Attention, Lab Fees, Pipework, Just a Scratch, Hey Arnold!, Island Dreams, Feng Shui, Coming Home, Clean Up After Donnie, Buck Me, Down to Earth, Day Release, Clear Skies, Building a Life, Swamped, Don Gone, Recalibration, Tourist Trap (ponto sem retorno), Home Sweet Home, Discharge Time. Termina com Lucia no hospital de Vice City após a oferta do Mattia. Dinheiro do cap. 1 se perde no fim: não farme.",
+   "tags": [
+    "capitulo 1",
+    "keys",
+    "missoes"
+   ],
+   "spoiler": true
+  },
+  {
+   "tipo": "historia",
+   "nome": "Capítulo 2 (Port Gellhorn)",
+   "texto": "O casal foge do hospital e se esconde num motel em Port Gellhorn. Missões: What's in the Bag?, Ambulance Chaser, Play Nurse, Overnight Charges, Just Moved In, Girl's Trip, Moses, New Look, How Do I Look?, Got Pills?, Daily Driver, Behind on Payments, Slam Dunk, Breakfast Run, Coffee Break, Prepare for Vice City (juntar $15.000), Afternoon Delight, Checking Out (ponto sem retorno).",
+   "tags": [
+    "capitulo 2",
+    "port gellhorn",
+    "motel"
+   ],
+   "spoiler": true
+  },
+  {
+   "tipo": "historia",
+   "nome": "Capítulo 3 (Vice City)",
+   "texto": "Em Vice City com Dre'Quan, Boobie, Mia e Yasmani; Raul monta a equipe pro assalto ao Sinfrontera National Bank. Ordem do golpe: Credit Check (libera Dye Pack Jammer) → Sinfrontera National Bank (reconhecimento) → Security Expert → Heist Planning → Company Property → The Missing Link → Safe Word → Hidden Charges → Bricked Up → The Cartel Heist. Clonin' Keys, Makin' GS libera o Key Cloner. Missões só do Jason: Dealer's Choice, Here Kitty Kitty, Boobie Time, Crosstown Traffic, Ride or Die. Só da Lucia: Mami Knows Best, Car Service, The Missing Link, South Leonida Real Estate.",
+   "tags": [
+    "capitulo 3",
+    "vice city",
+    "assalto",
+    "banco"
+   ],
+   "spoiler": true
+  },
+  {
+   "tipo": "historia",
+   "nome": "Capítulo 4 (Vice City)",
+   "texto": "Raul, Kordell, Andrea e Abe; peça central é o assalto ao aeroporto (VCIA Takedown). Missões incluem Ocean Beach, Pool Day, Lawyer Up, Party Hard, Heavy Lifting, Making Gainz, Too Much Baggage, Power Play, Child's Play, Headliners, Fully Catered, VCIA Takedown, Tie Up Loose Ends, Sunset (ponto sem retorno), Starting From Zero.",
+   "tags": [
+    "capitulo 4",
+    "aeroporto",
+    "vcia"
+   ],
+   "spoiler": true
+  },
+  {
+   "tipo": "historia",
+   "nome": "Capítulo 5 (final)",
+   "texto": "Trabalhos finais com Vinny, Mattia e Abe: Bird in the Hand, Taking Liberties, Doggie Bag, VC Baby, Operation Savage Glory, Honest Abe, Unfinished Business (ponto sem retorno), Protective Custody, The End of the Road.",
+   "tags": [
+    "capitulo 5",
+    "final"
+   ],
+   "spoiler": true
+  },
+  {
+   "tipo": "historia",
+   "nome": "Finais",
+   "texto": "Dois finais, escolhidos no fim de The End of the Road, na ponte ao sul de Key Lento. 'NO SURRENDER' (final ruim): Jason e Lucia enfrentam a polícia e morrem. 'SWIM FOR IT' (final bom): Jason faz Lucia pular da ponte e se entrega; Lucia aceita o acordo do Abe e depois visita Jason na prisão com Tommy. Depois o jogo volta antes das duas últimas missões: dá pra ver o outro final, sem recompensa extra.",
+   "tags": [
+    "finais",
+    "escolha",
+    "ending"
+   ],
+   "spoiler": true
+  },
+  {
+   "tipo": "historia",
+   "nome": "Missões perdíveis",
+   "texto": "Opcionais que podem passar: Get Shirley's Rum, Steal the Scooter, Meditate with Lucia, Ring the Bell!, Race Against Yago, Pick Up Shayna. Faça quando aparecerem.",
+   "tags": [
+    "missable",
+    "opcional"
+   ]
+  },
+  {
+   "tipo": "glitch",
+   "nome": "Softlock: Raul não liga pra Lucia",
+   "texto": "Bug em ~72% da história (PS5/Xbox): a história trava esperando ligação. Quem liga primeiro é a Valentina, e depois de pagar o advogado ($75.000) o Raul liga. Solução relatada: fazer os trabalhos do Yasmani pagando dica (ex.: lojas de adiantamento), limpar notificações do celular da Lucia, separar os dois, salvar como Lucia no hotel de Vice City, desligar o console segurando o botão 10-30 s e sair do quarto só com a Lucia. O patch de 23/11 não resolveu de vez. Faça backup do save antes.",
+   "tags": [
+    "bug",
+    "softlock",
+    "raul",
+    "lucia",
+    "patch"
+   ]
+  },
+  {
+   "tipo": "glitch",
+   "nome": "Glitches de dinheiro",
+   "texto": "Até agora não há glitch de dinheiro confirmado por guia grande. Desconfie de vídeo prometendo dinheiro infinito; se aparecer um, pesquise se já foi corrigido.",
+   "tags": [
+    "glitch",
+    "dinheiro"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Dinheiro por capítulo",
+   "texto": "Cap. 1: não farme (perde no fim). Cap. 2: venda carros sem rastreador pro Moses (~$1000+ cada, recarga ~2 min). Cap. 3: joalherias dão $10-25 mil (venda pro Yasmani); carro com rastreador padrão no Pay 'n' Spray ~$2.500-4.000; supercarros da lista do Randy ~$30-35 mil. Fim do cap. 4: cofres de bancos grandes até $205 mil cada (dica do Yasmani por $10 mil; dá 4 estrelas).",
+   "tags": [
+    "dinheiro",
+    "farm",
+    "yasmani",
+    "randy",
+    "moses"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Fundo familiar",
+   "texto": "'Save for the Future': o fundo familiar máximo custa $2 milhões.",
+   "tags": [
+    "dinheiro",
+    "poupanca"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Armas especiais",
+   "texto": "Ammu-Nation tem 24 lojas; as 'Expanded' vendem lança-granadas e lança-foguetes. O rifle Killtelligence SM-69 vem da caça do Bret e volta em qualquer armário da Ammu-Nation. Tiro na cabeça/coração deixa o animal 'pristine' e paga mais.",
+   "tags": [
+    "armas",
+    "ammu-nation",
+    "caca",
+    "rifle"
+   ]
+  },
+  {
+   "tipo": "mecanica",
+   "nome": "Mike Zero: tanque e jato",
+   "texto": "Na base Mile/Mike Zero Air Station dá pra pegar tanque e caça (4 estrelas ao entrar).",
+   "tags": [
+    "tanque",
+    "jato",
+    "base militar"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Checklist 100%",
+   "texto": "Aparece depois da história (Progress > Stats > 100% Completion). Nada é perdível. Pede: 100 tarefas opcionais, 39 Gang Operations, 22 Bank Jobs, 7 Payday Loans, 34/35 Smash 'n' Grabs, 50/91 Stick Ups, receptadores (narcóticos $100k, joias $100k, notas marcadas $250k, veículos $200k), 8 cofres grandes, 5/7 Kenton Sets, 15/18 conjuntos de cartas, 100/108 scans WAiNK, 33 achados subaquáticos, 30/34 revistas/livros, 15/18 meditações, 100/125 flamingos de cocaína, 70/79 estilos, 30/40 corridas, 42 medalhas de estande, 4 arcades, 5/7 sinuca, 2/3 minigolfe, 90/100 basquete, 42 drone trials, 300/397 stunts, 70/80 desafios, 15 caças do Bret, 200 veículos escaneados, 50/66 armas, 100 animais estudados.",
+   "tags": [
+    "100%",
+    "colecionaveis",
+    "checklist"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Troféus",
+   "texto": "55 troféus, nenhum online ou perdível, ~200 h pra platina, dificuldade 4/10. Troféu do 100%: 'A Long Road'.",
+   "tags": [
+    "trofeus",
+    "platina"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Murais",
+   "texto": "Achar os 1.010 murais dá uma garagem.",
+   "tags": [
+    "murais",
+    "colecionaveis",
+    "garagem"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Strangers & Freaks: Kirk",
+   "texto": "Questline do Kirk: 'Search for the Skunk Ape' (só à noite) e 'Help Kirk Find Mr. Mangrove' (só à noite e só com Lucia). Inclui Tree Effigies. Conta pro troféu Strangers & Freaks.",
+   "tags": [
+    "skunk ape",
+    "mr mangrove",
+    "kirk",
+    "noite"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Outros segredos citados",
+   "texto": "Evento aleatório do Satanás e chefe 'The Pretender'; easter egg de Scarface com a SMG 'Little Friend'; missão de abdução por OVNI na lista de Strangers. Detalhes ainda incompletos.",
+   "tags": [
+    "easter egg",
+    "scarface",
+    "ovni",
+    "segredo"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "glitch",
+   "nome": "Glitch de dinheiro do galpão vermelho (Apollo Aggregates)",
+   "texto": "Onde: galpão industrial vermelho em South Vice-Dale County, a leste/nordeste de Hamlet e ao norte de Key Lento, perto de três piscinas retangulares ao lado da rodovia. Como: 1) no escritório dos fundos pegue a cocaína da mesa e do cofre; 2) encha a bolsa com o dinheiro da van do meio e a cocaína das vans de ursinho; 3) guarde as bolsas no porta-malas do SEU carro; 4) salve MANUALMENTE; 5) carregue o save (nasce na casa do Jason com o porta-malas cheio); 6) volte, o loot reapareceu, repita. Venda no Brian's Lockup (sudoeste de Key Lento, teclado 7700); o pagamento cai na caixa de correio dias depois no jogo. Rende ~$8.600-11.000 por rodada. Funcionava depois do patch 01.002.002 segundo vários sites.",
+   "tags": [
+    "glitch",
+    "dinheiro",
+    "infinito",
+    "hamlet",
+    "celeiro",
+    "galpao",
+    "ursinho"
+   ]
+  },
+  {
+   "tipo": "glitch",
+   "nome": "Riscos do glitch do galpão",
+   "texto": "Morrer ou ser preso com o loot = perde tudo. Algumas bolsas ficam sem poder pegar. Autosave é de slot único: use save manual e guarde um backup. Dizem que parceiro parado perto do galpão impede o loot de reaparecer. A Rockstar pode corrigir a qualquer momento.",
+   "tags": [
+    "glitch",
+    "risco",
+    "save"
+   ]
+  },
+  {
+   "tipo": "glitch",
+   "nome": "Variantes do glitch do galpão (não confirmadas)",
+   "texto": "Um site diz que trocando de personagem (a partir do Cap. 2) e usando van de 10 vagas dá $82 mil a $230 mil por carga vendendo pro Tyrone no Cap. 3, e que com duas vans e o parceiro dá ~$90-100 mil em 10 min. Ninguém mais confirmou.",
+   "tags": [
+    "glitch",
+    "dinheiro",
+    "van",
+    "tyrone"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "glitch",
+   "nome": "Falsos glitches de dinheiro",
+   "texto": "A 'sequência de botões de dinheiro infinito' é o cheat oficial de $250.000: só depois da história e desliga o save. 'Cassino do carro infinito' e vídeos de '$100 mil no início' não são comprovados. Duplicar carro é coisa do GTA Online, não do VI.",
+   "tags": [
+    "glitch",
+    "cheat",
+    "golpe",
+    "fake"
+   ]
+  },
+  {
+   "tipo": "glitch",
+   "nome": "Patch 01.002.002 (23/11/2026)",
+   "texto": "Corrigiu: crashes, clima travado, autosave falhando, ligações que não chegavam (incluindo as que avançam a história), procurado que não sumia, barra de levantamento terra da academia, parceiro que não entregava bolsas pros receptadores. Não corrigiu: glitch de dinheiro do galpão e um glitch de roupa da Lucia. Crash CE-108255-1 no PS5 ainda existe. ~604 MB no PS5, ~1,6 GB no Xbox.",
+   "tags": [
+    "patch",
+    "update",
+    "bug",
+    "correcao"
+   ]
+  },
+  {
+   "tipo": "glitch",
+   "nome": "Saindo do Capítulo 1",
+   "texto": "Ao sair do Capítulo 1 o dinheiro de bolso some. Até $5.000 guardados no Family Savings são mantidos.",
+   "tags": [
+    "dinheiro",
+    "capitulo 1",
+    "poupanca"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "cheat",
+   "nome": "Como usar cheats",
+   "texto": "Liberam só depois de terminar a história (Progresso > Cheats), cada um com sua condição. Abra o celular (D-pad cima), segure L1 e aperte R1 (Xbox: LB + RB) e digite a sequência no D-pad. Mesma sequência no PS5 e Xbox. Usar cheat desliga troféus e o salvamento até fechar o jogo: salve antes.",
+   "tags": [
+    "cheat",
+    "codigo",
+    "como usar"
+   ]
+  },
+  {
+   "tipo": "cheat",
+   "nome": "Cheats do jogador",
+   "texto": "$250.000: ↑ → ↓ ← ↑ ← ↓ →. Bêbado: ↑ ← → ↑ ↑ ← → ↑ ← →. Subir procurado: ← ↓ → ↓ ↑ → ↑. Focus infinito: ↓ ↑ ↑ ↓ ↑ ↓ ↑ ↓ ↑ →. Sem dano de queda: ↓ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↓. Paraquedas: → ↑ ← ↑ → ↑ ← ↑ →. Colete: ↓ ↑ ← ↑ ↑ ↑ ↑ ↑ ↓ ↓. Consertar veículo: → ↓ ↓ → ↓ → → ↓. Nitro infinito: → ↓ ↓ → ↓ → → ←.",
+   "tags": [
+    "cheat",
+    "dinheiro",
+    "colete",
+    "focus"
+   ]
+  },
+  {
+   "tipo": "cheat",
+   "nome": "Cheats de combate",
+   "texto": "Munição cheia: ↓ ↑ → ↓ ← ← ↑ ↑ ↓ ←. Munição infinita: ↓ ↑ → ↓ ← ← ↑ ↓ ↓ ↓. Sem recarregar: ↓ ↑ → ↓ ← ← ↑ ↓ ↓ ↑. Explosivos: → ↑ ← ↑ → ↑ ← ↑ ←. Munição incendiária: ↓ ↑ → ↓ ← ↓ ↑ → ↓ ↓. Garrafas explosivas: ↓ ↑ ← ← → ↓ ↓ ↑ ←. Escopeta explosiva: ↓ ↑ → ↓ ← ↓ ↑ → ↓ ←. Lança-mísseis H-AT: → ↑ ← ↑ → ↑ ← ↑ ↑. Attack Force (empurra alvos): ↓ ↑ ← ← → ↓ ↓ ↑ ↓.",
+   "tags": [
+    "cheat",
+    "arma",
+    "municao"
+   ]
+  },
+  {
+   "tipo": "cheat",
+   "nome": "Cheats de veículos",
+   "texto": "Todos começam com ← ↑ → ↓ ←, depois: Ambulância → → →; Airboat ↓ ↑ →; Banshee → ↑ ←; BMX ← ↑ →; Carbon RS ← ↑ ↑; Dominator '65 → ← →; Emerus → ↑ →; Flamingo inflável ↓ ↑ ↓; Táxi → → ←; Caça Lazer ↑ ↑ ↓; Trator/Bulldozer → → ↓; Avião Mallard ↑ ↑ ↑; Tanque Rhino → ← ↑; Sanchez ← → ↑; Helicóptero Sea Sparrow ↑ ↑ →; Thrax → ↑ ↑; Zombie Bobber ← ↑ ↓.",
+   "tags": [
+    "cheat",
+    "carro",
+    "tanque",
+    "helicoptero",
+    "aviao"
+   ]
+  },
+  {
+   "tipo": "cheat",
+   "nome": "Cheats de ambiente e filtros",
+   "texto": "Avançar hora: ↓ → ↑ ↓ → ↑ ↑. Pausar hora: ↓ → ↑ ↓ → ↑ ←. Trocar clima: ↓ → ↑ ↓ → ↑ →. Filtros de tela começam com ↓ ↓ ↑ → → ↑ ← ← (Golden Hour + ↑ ↑; Neon Jungle + ↑ ←; Videotape + → ↓; Hellscape + ← ←).",
+   "tags": [
+    "cheat",
+    "clima",
+    "hora",
+    "filtro"
+   ]
+  },
+  {
+   "tipo": "dica",
+   "nome": "Dicas de controle",
+   "texto": "Segurar D-pad direita: pedir ao parceiro distração à polícia, dirigir ou vender o saque. Piloto automático: segure baixo ou peça pro parceiro dirigir. Dá pra fixar o minimapa e trocar unidades nas configurações. Toque esquerda/direita no carro liga a seta.",
+   "tags": [
+    "controles",
+    "parceiro",
+    "piloto automatico",
+    "minimapa"
+   ]
+  },
+  {
+   "tipo": "dica",
+   "nome": "Acalmar policial",
+   "texto": "Sem arma na mão, segure o gatilho esquerdo num policial: opção de acalmar, pode tirar 1 estrela.",
+   "tags": [
+    "policia",
+    "estrela",
+    "defuse"
+   ]
+  },
+  {
+   "tipo": "dica",
+   "nome": "Limite de dinheiro no bolso",
+   "texto": "Cada personagem carrega no máximo $20.000 em espécie. Deposite no caixa eletrônico.",
+   "tags": [
+    "dinheiro",
+    "limite"
+   ]
+  },
+  {
+   "tipo": "dica",
+   "nome": "Pontos de comportamento",
+   "texto": "Fazer carinho em cães e gatos (gatilho esquerdo) e jogar lixo no lixo dão Focus e pontos de comportamento. Comprar roupa pros dois ajuda o romance.",
+   "tags": [
+    "focus",
+    "animais",
+    "romance"
+   ]
+  },
+  {
+   "tipo": "dica",
+   "nome": "Scooter Bros Premium",
+   "texto": "App entrega carro, conserta e tira do pátio. Premium custa $12.500 e dá 3 usos grátis por dia. Mecânico por ligação libera após 'Just a Scratch'.",
+   "tags": [
+    "carro",
+    "app",
+    "conserto",
+    "patio"
+   ]
+  },
+  {
+   "tipo": "dica",
+   "nome": "RydeMe gorjeta",
+   "texto": "Gorjeta de $5 (até 2x) faz o motorista correr; $100 = viagem instantânea.",
+   "tags": [
+    "viagem",
+    "rydeme"
+   ]
+  },
+  {
+   "tipo": "dica",
+   "nome": "Caixa eletrônico com guincho",
+   "texto": "Caminhão de reboque arranca caixas eletrônicos (missões do Yasmani). As notas são marcadas: venda pro receptador.",
+   "tags": [
+    "dinheiro",
+    "caixa eletronico",
+    "yasmani"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Missões secundárias - Cap. 1",
+   "texto": "Kirk: Skunk Apeology 101, Tree Effigies (Pelican Valley), Mr. Mangrove (Cottonmouth Lake). Dr. Merle: The Final Flush. Freddie: Retest Freddie's Defenses (bunker). Shirley: rum e scooter. Cal: Ring the Bell! e Catch a Bigger Fish (peixe-papagaio acima de 2 lb).",
+   "tags": [
+    "secundaria",
+    "capitulo 1",
+    "kirk",
+    "shirley"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Missões secundárias - Cap. 2",
+   "texto": "Kyle (McKittrick Farm, Kelly County), Bret Vogel (caça, só Jason, perto do Mount Kalaga), Moses (6 carros, Port Gellhorn), Alvan West (turistas desaparecidos, Port Gellhorn), Billy (Thrillbillies no Mud Club). Sem doador: UFO Abduction (Kelly County), Manhunt (Hyde Island), Defeat Satan (festa em Port Gellhorn).",
+   "tags": [
+    "secundaria",
+    "capitulo 2",
+    "bret",
+    "moses",
+    "ovni"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Missões secundárias - Cap. 3",
+   "texto": "Yago (corridas em Salton), Billy, Andy/Cellerica (só Lucia), Yasmani (caixas eletrônicos, payday loans, seguir carro-forte), Tyrone (laboratórios Kitty Litter), Dunk (esconderijos de droga em Kelly County), Dodos Rising, Randy (lista de carros), José Bermudez (bunkers), Papa Audacity (dublês em Ocean Beach).",
+   "tags": [
+    "secundaria",
+    "capitulo 3",
+    "yasmani",
+    "randy",
+    "yago"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Missões secundárias - Cap. 4",
+   "texto": "Pilot Pete (só Jason): The Last Mile e entregas aéreas em Wild Hog, Southpoint e Leonard County. Festa do Eddie Acosta.",
+   "tags": [
+    "secundaria",
+    "capitulo 4",
+    "aviao",
+    "pete"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Troféu Strangers & Freaks",
+   "texto": "Pede completar 8 linhas de missões de estranhos pelo estado.",
+   "tags": [
+    "trofeu",
+    "secundaria"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Ovo de Páscoa na torre",
+   "texto": "Torre de rádio ao norte de Hamlet (South Vice-Dale). Subir leva ~7 min. Pegue um ovo do ninho e arremesse: dispara uma cena. Outra torre tem um influenciador lá em cima.",
+   "tags": [
+    "easter egg",
+    "torre",
+    "ovo",
+    "hamlet"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "OVNI: Alien Dreams",
+   "texto": "Estrada perto do Starlet Motel (Port Gellhorn), entre 2h e 3h. O OVNI abduz alguém. Continua numa instalação ao sul de Hamlet (código 2314 no painel, elevador até o laboratório, copo de leite pro alien). Recompensa: aumento permanente de vida, stamina e Focus + troféu 'The Truth Is Out There'.",
+   "tags": [
+    "ovni",
+    "alien",
+    "port gellhorn",
+    "trofeu",
+    "2314"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Stonehenge e meteorito",
+   "texto": "No cume do Mount Kalaga há um círculo de pedras e um meteorito coletável (vende no Lifeinvader Marketplace ou penhor).",
+   "tags": [
+    "mount kalaga",
+    "meteorito",
+    "segredo"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Monumento do olho do Chiliad",
+   "texto": "Manifest Canyon (Kelly County), oeste da SR-73, norte de Port Gellhorn. Numa tempestade à noite um raio acende uma chama. Escaneie com WAiNK.",
+   "tags": [
+    "chiliad",
+    "misterio",
+    "raio"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Final Flush (Dr. Merle)",
+   "texto": "Banheiro masculino de Corsair Key, box esquerdo: escaneie o QR do panfleto com WAiNK, responda 'TRUTH', vá ao Frank's Waffles, depois à estação de esgoto. Recompensa: stamina máxima permanente.",
+   "tags": [
+    "missao secreta",
+    "stamina",
+    "corsair key"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Portal pra Vice City 2002",
+   "texto": "Torre Badger R&D em Key Lento: visite 12 usinas LPL na ordem de 'LIFEISPASSINGMEBY'. Recompensa: camisa havaiana do Tommy e moto. Atrás do balcão do Donnie, um botão mostra anúncio do Malibu Club.",
+   "tags": [
+    "vice city 2002",
+    "tommy",
+    "segredo"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Referências a Vice City clássico",
+   "texto": "Ocean View Hotel (1º esconderijo do Tommy), mansão estilo Vercetti em Starfish Island (não entra), Big Smoke Cigar Co. no centro, Phil's Ammu-Nation.",
+   "tags": [
+    "vice city",
+    "tommy",
+    "referencia"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Chapéu do Arthur Morgan",
+   "texto": "Venda de garagem ao sul de Port Gellhorn (casa azul com cerca e sofá branco): 'Genuine Cowboy Hat' por $35.",
+   "tags": [
+    "red dead",
+    "chapeu",
+    "garagem"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Referências a Red Dead e GTA IV",
+   "texto": "Livro do Flaco Hernandez na marina do Brian; livro de cowboy de New Austin no Jacob's Tavern (Millport); notas com presidentes de RDR2; livro 'Lethal by Design' na casa do Jason (caso Gracie Ancelotti, GTA IV).",
+   "tags": [
+    "red dead",
+    "gta iv",
+    "livro"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Carro do Paul Walker",
+   "texto": "Garagem trancada em Vespucci Island, a oeste de Vice Beach: carro estilo Velozes e Furiosos. Se registrar antes de conhecer o Moses, sai de graça.",
+   "tags": [
+    "velozes e furiosos",
+    "carro",
+    "vespucci"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Pistola Turnt Nipper .38",
+   "texto": "Ponta de Bobcat Key, ao sul de Capri: atire nas 3 cordas do parapente preso na árvore e pegue a pistola no assento. Dá no Cap. 1.",
+   "tags": [
+    "arma",
+    "segredo",
+    "capri"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Caranguejo gigante (Crab Lab)",
+   "texto": "Pelican Valley Crab Lab (Grassrivers): senha CLEAVES no computador (susto ao sair). Cofre 00072, teclado do barco 0212. Referência ao filme Island Claws.",
+   "tags": [
+    "segredo",
+    "codigo",
+    "cofre",
+    "grassrivers"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Navio fantasma",
+   "texto": "Farol St. Lucia, norte da Little Hardin Island (Leonard County): à noite, dois fantasmas brigam; à meia-noite, binóculos mostram o navio fantasma. Recompensa: faca amaldiçoada.",
+   "tags": [
+    "fantasma",
+    "farol",
+    "faca",
+    "noite"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Bloco do Mario",
+   "texto": "Ponto de meditação nas ruínas ao sul de Moreau (norte do Mount Kalaga): suba na ruína e bata no bloco invisível. Boné do Mario pro Jason e do Luigi pra Lucia.",
+   "tags": [
+    "mario",
+    "bone",
+    "meditacao"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Red Hulk do Kyle",
+   "texto": "Fazenda McKittrick (Frogswater, Kelly County), Cap. 2: ajude com os morangos gigantes, volte semanas depois e veja a transformação. $5.000 se matar, um abraço se poupar.",
+   "tags": [
+    "hulk",
+    "kyle",
+    "fazenda"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Papagaio Tony",
+   "texto": "Atrás da Three Sheets Liquor (Key Lento). Perguntar sobre 'Generator' dá $1.000-2.000.",
+   "tags": [
+    "papagaio",
+    "dinheiro",
+    "key lento"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Dardo do Saw",
+   "texto": "Em South Hyde Island, referência a Jogos Mortais: recompensa de $25.000.",
+   "tags": [
+    "saw",
+    "dinheiro",
+    "segredo"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Placa das outras cidades",
+   "texto": "Numa ilhazinha perto de um piano de cauda entre árvores: placa com Carcer City, Liberty City, San Fierro, Las Venturas e Los Santos.",
+   "tags": [
+    "referencia",
+    "placa",
+    "cidades"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Mais referências",
+   "texto": "Fabian LaRouche (yoga, GTA V) numa revista na casa do Jason; Niko Bellic aparece no Cap. 5 (Taking Liberties); Jimmy De Santa na lista VIP de Headliners (Cap. 4); console JoySystem na casa do Jason com o jogo 'Tenebrae Lux'.",
+   "tags": [
+    "gta v",
+    "gta iv",
+    "niko",
+    "jimmy"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Filmar polícia",
+   "texto": "Filmar policiais durante uma prisão dá 1 estrela de procurado.",
+   "tags": [
+    "policia",
+    "celular"
+   ]
+  }
+ ]
+}
