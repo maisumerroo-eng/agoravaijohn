@@ -35,7 +35,7 @@ function linkBing(href) {
 
 const BUSCADORES = {
   bing: async (q) => {
-    const { status, html } = await pegar(`https://www.bing.com/search?q=${encodeURIComponent(q)}&setlang=pt-br&cc=br`);
+    const { status, html } = await pegar(`https://www.bing.com/search?q=${encodeURIComponent(q)}&setlang=en-us&cc=us&count=10`);
     const res = [];
     for (const bloco of html.split('<li class="b_algo"').slice(1)) {
       const a = bloco.match(/<h2[^>]*>\s*<a[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/);

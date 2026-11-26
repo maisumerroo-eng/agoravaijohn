@@ -124,9 +124,10 @@ export async function gerarGemini({ chave, system, historico = [], partes, schem
     { role: "user", parts: partes.map((p) => (p.imagem ? imagemParte(p.imagem) : p.audio ? { inline_data: { mime_type: "audio/wav", data: p.audio } } : { text: p.texto })) },
   ];
   const AVISO_SEM_BUSCA = "\n\nATENÇÃO: a busca na internet está indisponível agora. NÃO chute números, notas, datas, preços ou fatos que não estão no banco. Se precisar disso, diga curto que não conseguiu pesquisar agora.";
+  const AVISO_RESULTADO = "\n\nVocê acabou de pesquisar na internet (resultados abaixo, na resposta da função). Responda com base neles, citando o fato principal. Se os resultados não tiverem a resposta, diga curto que não achou nada confiável.";
   const AVISO_FUNCAO = "\n\nPra pesquisar na internet, chame a função pesquisar_web (só quando o banco não responde).";
   const montar = (modelo, opc, extra = []) => ({
-    systemInstruction: { parts: [{ text: system + (opc.busca === "funcao" ? AVISO_FUNCAO : busca && !opc.busca ? AVISO_SEM_BUSCA : "") }] },
+    systemInstruction: { parts: [{ text: system + (opc.busca === "funcao" ? AVISO_FUNCAO : opc.busca === "resultado" ? AVISO_RESULTADO : busca && !opc.busca ? AVISO_SEM_BUSCA : "") }] },
     contents: [...contents, ...extra],
     generationConfig: {
       maxOutputTokens: maxTokens,
@@ -177,10 +178,10 @@ export async function gerarGemini({ chave, system, historico = [], partes, schem
       const extra = [
         { role: "model", parts: out.chamadas },
         { role: "user", parts: out.chamadas.map((c) => ({ functionResponse: { name: c.functionCall.name, response: c === chamada
-          ? (achado.resultados.length ? { resultados: achado.resultados } : { erro: "busca não retornou nada; diga que não achou" })
+          ? (achado.resultados.length ? { consulta, resultados: achado.resultados } : { consulta, erro: "busca não retornou nada; diga que não achou" })
           : { erro: "só uma busca por vez" } } })) },
       ];
-      const r2 = await chamar(modelo, { pensar: opcUsada.pensar, busca: false }, extra);
+      const r2 = await chamar(modelo, { pensar: opcUsada.pensar, busca: "resultado" }, extra);
       if (!r2.ok) throw await erroGemini(r2);
       const out2 = await lerResposta(r2, aoTexto);
       return { texto: (out.texto + out2.texto).trim(), fontes: fontesWeb, pesquisou: achado.resultados.length > 0, modelo,
