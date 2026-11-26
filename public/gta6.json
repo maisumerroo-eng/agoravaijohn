@@ -1837,6 +1837,258 @@
     "policia",
     "celular"
    ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Furries em Leonida",
+   "texto": "Sim, o jogo tem furries. Leonida tem uma 'proibição de furries' citada no jogo e um culto chamado 'The Furverts'. Tem também a missão de estranho 'No Paws Clause', com um homem fantasiado de raposa.",
+   "tags": [
+    "furry",
+    "furries",
+    "furverts",
+    "raposa",
+    "fantasia",
+    "no paws clause"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "No Paws Clause",
+   "texto": "Missão de estranho (Strangers & Freaks) com um homem de fantasia de raposa. Dá pra fazer com Jason ou Lucia, a partir do Capítulo 3.",
+   "tags": [
+    "furry",
+    "raposa",
+    "missao secundaria",
+    "strangers"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Capri Cops (By Invitation Only)",
+   "texto": "Missão de estranho em Capri, a cidade rica de Mariana County. Capítulo 3, Jason ou Lucia.",
+   "tags": [
+    "capri",
+    "missao secundaria",
+    "policia"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Dodos Rising",
+   "texto": "Linha de missões de um grupo ambientalista: Bring Out the Chimp (laboratório perto do aeroporto), Sisters of the Sea (Oceanarium em Rosebud), Twin Flames (fracking em Watson Bay) e Dodo, Rise! (ovo no zoológico, só Lucia).",
+   "tags": [
+    "dodos rising",
+    "zoologico",
+    "missao secundaria",
+    "ambientalista"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Papa Audacity (dublês)",
+   "texto": "Linha de missões de dublê em Ocean Beach: The Unknown Stuntman, Trial by Tire (moto de trilha), AudaCity Stunts, Catching a Whale (Sundown Airfield) e a festa The Audacity nos Neo Paloma Apartments.",
+   "tags": [
+    "dubles",
+    "stunts",
+    "ocean beach",
+    "moto",
+    "missao secundaria"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Cellerica (só Lucia)",
+   "texto": "Linha de missões da Lucia com o Andy: Climbing the Cellerichain, Peach! (iniciação no campus), Read the Label, Puff Puff Pass (galpão Paper Boys).",
+   "tags": [
+    "lucia",
+    "cellerica",
+    "missao secundaria"
+   ]
+  },
+  {
+   "tipo": "atividade",
+   "nome": "Defeat Satan",
+   "texto": "Missão de estranho numa festa em Port Gellhorn onde você enfrenta o 'Satanás' (chefe 'The Pretender'). Capítulo 2.",
+   "tags": [
+    "satanas",
+    "satan",
+    "port gellhorn",
+    "chefe"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Ritual no armazém de Capri",
+   "texto": "Armazém abandonado perto da ferrovia em Capri Island: colocar alguém desacordado no pentagrama e jogar molotov dispara visões e vozes. Conteúdo pesado.",
+   "tags": [
+    "ritual",
+    "capri",
+    "segredo",
+    "terror"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Florida Man no jogo",
+   "texto": "O jogo zoa o meme 'Florida Man': brasão com jacaré, o 'Coringa de Vice City' e a 'mulher dos dois martelos' aparecem em notícias e redes sociais do jogo.",
+   "tags": [
+    "florida man",
+    "humor",
+    "redes sociais"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Valentina e Jay Norris",
+   "texto": "Valentina (do GTA Online) contrata Jason e Lucia como guarda-costas. Jay Norris (dono do Lifeinvader no GTA V) é citado.",
+   "tags": [
+    "gta online",
+    "gta v",
+    "valentina",
+    "referencia"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Boate NINE 1 NINE",
+   "texto": "Boate de Vice City que parodia a E11EVEN de Miami.",
+   "tags": [
+    "boate",
+    "vice city",
+    "noite",
+    "e11even"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Casas de famosos",
+   "texto": "Dizem que dá pra ver a casa inspirada no The Weeknd em Peacock Estates (área restrita), um sósia do Juice WRLD no Snapmatic ('badlife999') e o bunker do Freddie Gibbs com $5.000 e um carro Dubster.",
+   "tags": [
+    "famosos",
+    "weeknd",
+    "juice wrld",
+    "freddie gibbs",
+    "bunker"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Referências a séries e filmes",
+   "texto": "Breaking Bad (secretária eletrônica na casa do Donnie e advogado no lixo), Collateral (passageiro de terno cinza em Vice Beach), Seinfeld (placa 'A MAN'), pôster 'The Key Lento' (Key Largo, 1948).",
+   "tags": [
+    "breaking bad",
+    "filme",
+    "serie",
+    "referencia"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Snapmatic: Race and Chase",
+   "texto": "Rolando o feed do Snapmatic uns 30-40 s aparece um post verde com desenho infantil citando 'Race and Chase', o nome original do primeiro GTA.",
+   "tags": [
+    "snapmatic",
+    "celular",
+    "gta 1",
+    "segredo"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Macca & Friends",
+   "texto": "Desenho do crocodilo rosa na TV da casa do Jason (canal Weazel), com cenas que lembram a missão inicial do CJ e do Big Smoke.",
+   "tags": [
+    "tv",
+    "desenho",
+    "san andreas",
+    "casa do jason"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Quadrinhos e cartas",
+   "texto": "Quadrinhos paródia de X-Men e Quarteto Fantástico ficam em postos e cantos do mapa; dá pra guardar numa caixa na casa do Jason e vender em penhores. São 480 cartas colecionáveis (18 conjuntos).",
+   "tags": [
+    "quadrinhos",
+    "cartas",
+    "colecionaveis",
+    "penhor"
+   ]
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Lil' Probe'Inn e Área 69",
+   "texto": "Adesivos de para-choque sobre o 'incidente da Área 69 de 1992' e uma garagem em Bellville com anotações de um teórico que acha que vive num videogame (cita 'L' e 'J' como as únicas pessoas livres).",
+   "tags": [
+    "alien",
+    "conspiracao",
+    "bellville",
+    "adesivo"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Lojas paródia",
+   "texto": "Chacey's, FizzAzz, Sprunk, Jester's e Baracoa parodiam Arby's, Fanta, Sprite, Pringles e Bacardi.",
+   "tags": [
+    "lojas",
+    "marcas",
+    "parodia"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Bicho no banco de trás",
+   "texto": "Ao roubar carro dá pra achar um gato ou outro animal no banco de trás.",
+   "tags": [
+    "carro",
+    "animal",
+    "roubo"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Rádios do jogo",
+   "texto": "Jeremy Irons é DJ (Dicky, na Kaleidoscope FM) e Weird Al aparece na Vice City FM.",
+   "tags": [
+    "radio",
+    "musica",
+    "dj"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "QR codes reais",
+   "texto": "Pôsteres 'Peekhole' têm QR code de verdade que leva ao site da Rockstar.",
+   "tags": [
+    "qr code",
+    "poster",
+    "segredo"
+   ],
+   "confirmado": false
+  },
+  {
+   "tipo": "curiosidade",
+   "nome": "Livro Orca",
+   "texto": "Paródia do David Goggins: livro 'Orca' na casa do Jason e numa revista nos fundos.",
+   "tags": [
+    "livro",
+    "casa do jason",
+    "parodia"
+   ],
+   "confirmado": false
   }
  ]
 }

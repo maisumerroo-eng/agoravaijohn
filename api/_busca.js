@@ -34,6 +34,33 @@ function linkBing(href) {
 }
 
 const BUSCADORES = {
+  fandom: async (q) => {
+    const termo = q.replace(/\b(gta ?(6|vi)|tiktok|youtube|reddit)\b/gi, "").trim() || q;
+    const r = await fetch(`https://gta.fandom.com/api.php?action=query&list=search&format=json&srlimit=8&srprop=snippet&srwhat=text&srsearch=${encodeURIComponent(termo + " GTA VI")}`, { headers: { "user-agent": UA } });
+    const status = r.status;
+    const j = r.ok ? await r.json() : {};
+    const res = (j.query?.search || []).map((x) => ({ titulo: x.title + " (GTA Wiki)", url: "https://gta.fandom.com/wiki/" + encodeURIComponent(x.title.replace(/ /g, "_")), trecho: limpar(x.snippet).slice(0, 300) }));
+    return { status, res };
+  },
+  youtube: async (q) => {
+    const { status, html } = await pegar(`https://www.youtube.com/results?search_query=${encodeURIComponent(q)}&hl=pt-BR`);
+    const res = [];
+    const re = /"videoRenderer":\{"videoId":"([\w-]{11})"[\s\S]*?"title":\{"runs":\[\{"text":"((?:[^"\\]|\\.)*)"[\s\S]*?(?:"detailedMetadataSnippets":\[\{"snippetText":\{"runs":\[([\s\S]*?)\]\}|"lengthText")/g;
+    let m;
+    while ((m = re.exec(html)) && res.length < 8) {
+      const trecho = m[3] ? [...m[3].matchAll(/"text":"((?:[^"\\]|\\.)*)"/g)].map((x) => x[1]).join("") : "";
+      const dec = (t) => { try { return JSON.parse('"' + t + '"'); } catch { return t; } };
+      res.push({ titulo: dec(m[2]) + " (YouTube)", url: "https://www.youtube.com/watch?v=" + m[1], trecho: dec(trecho).slice(0, 300) });
+    }
+    return { status, res };
+  },
+  reddit: async (q) => {
+    const r = await fetch(`https://www.reddit.com/search.json?q=${encodeURIComponent(q)}&limit=8&sort=relevance`, { headers: { "user-agent": "agoravaijohn/1.0 (copiloto de jogo)" } });
+    const status = r.status;
+    const j = r.ok ? await r.json().catch(() => ({})) : {};
+    const res = (j.data?.children || []).map((c) => ({ titulo: c.data.title + " (Reddit)", url: "https://www.reddit.com" + c.data.permalink, trecho: String(c.data.selftext || "").slice(0, 300) }));
+    return { status, res };
+  },
   bing: async (q) => {
     const { status, html } = await pegar(`https://www.bing.com/search?q=${encodeURIComponent(q)}&setlang=en-us&cc=us&count=10`);
     const res = [];
@@ -72,10 +99,10 @@ const BUSCADORES = {
   },
 };
 
-let preferido = "bing"; // o que funcionou por último vai primeiro
+let preferido = "ddglite"; // o que funcionou por último vai primeiro
 
-export async function buscarWeb(consulta, max = 5, { todos = false } = {}) {
-  const ordem = Object.keys(BUSCADORES).sort((a, b) => (a === preferido ? -1 : b === preferido ? 1 : 0));
+export async function buscarWeb(consulta, max = 5, { todos = false, so = null } = {}) {
+  const ordem = so ? [so].flat().filter((n) => BUSCADORES[n]) : Object.keys(BUSCADORES).sort((a, b) => (a === preferido ? -1 : b === preferido ? 1 : 0));
   const relatorio = {};
   for (const nome of ordem) {
     try {
@@ -88,4 +115,28 @@ export async function buscarWeb(consulta, max = 5, { todos = false } = {}) {
     }
   }
   return { ok: false, status: 0, resultados: [], relatorio };
+}
+
+// Pesquisa principal: TikTok primeiro (via DuckDuckGo com site:tiktok.com), depois a wiki do GTA (Fandom),
+// YouTube e web geral — tudo em paralelo. Resultado marcado com a origem.
+const ate = (p, ms) => Promise.race([p, new Promise((ok) => setTimeout(() => ok({ resultados: [] }), ms))]);
+export async function buscarComFonte(consulta, fonte = "tiktok", max = 8) {
+  const q = String(consulta || "").replace(/\s*site:\S+/g, "").replace(/\btiktok\b/gi, "").trim().slice(0, 200);
+  if (!q) return { consulta: "", resultados: [], ok: false };
+  const comGta = /gta|grand theft/i.test(q) ? q : q + " GTA 6";
+  const [tiktok, wiki, yt, web] = await Promise.all([
+    ate(buscarWeb(comGta + " site:tiktok.com", 5, { so: "ddglite" }), 6000),
+    ate(buscarWeb(comGta, 3, { so: "fandom" }), 6000),
+    ate(buscarWeb(comGta, 4, { so: "youtube" }), 6000),
+    ate(buscarWeb(comGta, 5, { so: ["ddglite", "bing"] }), 6000),
+  ]);
+  const marcar = (lista, origem) => lista.map((x) => ({ ...x, origem }));
+  const ordem = fonte === "youtube" ? [yt, tiktok, wiki, web] : fonte === "geral" || fonte === "reddit" ? [web, wiki, tiktok, yt] : [tiktok, wiki, yt, web];
+  const nomes = new Map([[tiktok, "tiktok"], [wiki, "wiki do GTA"], [yt, "youtube"], [web, "web"]]);
+  const lista = [];
+  for (const r of ordem) for (const x of marcar(r.resultados || [], nomes.get(r))) {
+    if (x.origem === "tiktok" && !/tiktok\.com/.test(x.url)) x.origem = "web";
+    if (!lista.some((y) => y.url === x.url)) lista.push(x);
+  }
+  return { consulta: comGta, resultados: lista.slice(0, max), ok: lista.length > 0 };
 }

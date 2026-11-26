@@ -73,10 +73,10 @@ const imagemParte = (b64) => ({ inline_data: { mime_type: "image/jpeg", data: b6
 const FERRAMENTA_BUSCA = {
   functionDeclarations: [{
     name: "pesquisar_web",
-    description: "Pesquisa na internet. Use para fatos recentes do GTA VI (notas, patches, glitches, missões, datas, preços) que não estão no banco de conhecimento.",
+    description: "Pesquisa na internet (TikTok primeiro). Use SEMPRE que a resposta não estiver no banco: qualquer fato do GTA VI (segredos, easter eggs, glitches, missões, personagens, notas, patches).",
     parameters: { type: "OBJECT", properties: {
       consulta: { type: "STRING", description: "Termos de busca curtos, de preferência em inglês e com 'GTA 6'." },
-      fonte: { type: "STRING", enum: ["geral", "tiktok", "reddit", "youtube"], description: "Onde procurar. tiktok/youtube = vídeos de dicas e segredos; reddit = comunidade (glitches, bugs, dúvidas)." },
+      fonte: { type: "STRING", enum: ["tiktok", "geral", "youtube", "reddit"], description: "Padrão: tiktok (fonte principal). geral/youtube/reddit se precisar." },
     }, required: ["consulta"] },
   }],
 };
@@ -171,9 +171,9 @@ export async function gerarGemini({ chave, system, historico = [], partes, schem
     // O modelo pediu pesquisa (busca grátis): pesquisa e pede a resposta final com os resultados.
     if (opcUsada.busca === "funcao" && out.chamadas.length) {
       const chamada = out.chamadas[0];
-      const SITES = { tiktok: " site:tiktok.com", reddit: " site:reddit.com", youtube: " site:youtube.com" };
-      const consulta = String(chamada.functionCall.args?.consulta || "").slice(0, 200) + (SITES[chamada.functionCall.args?.fonte] || "");
-      const achado = await buscarWeb(consulta);
+      const { buscarComFonte } = await import("./_busca.js");
+      const achado = await buscarComFonte(chamada.functionCall.args?.consulta, chamada.functionCall.args?.fonte);
+      const consulta = achado.consulta;
       const fontesWeb = achado.resultados.slice(0, 4).map((x) => ({ titulo: x.titulo, url: x.url }));
       const extra = [
         { role: "model", parts: out.chamadas },

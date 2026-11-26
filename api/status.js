@@ -11,13 +11,14 @@ export default async function handler(req, res) {
   }));
   res.setHeader("Cache-Control", "no-store");
   res.status(200).json({
-    versao: "2026-11-27-live1",
+    versao: "2026-11-27-live2",
     ia: gem.some((k) => limparChave(process.env[k]).length >= 20) ? "gemini" : process.env.ANTHROPIC_API_KEY ? "anthropic" : "vercel-ai-gateway",
     variaveis_gemini: formato,
     ambiente: process.env.VERCEL_ENV || "local",
     ...(req.query?.live ? { teste_live: await testarLive(req) } : {}),
     ...(req.query?.modelos ? { modelos: await listarNomes(chaveGemini(req)) } : {}),
-    ...(req.query?.busca ? { teste_busca: (await buscarWeb(String(req.query.busca), 3, { todos: true })).relatorio } : {}),
+    ...(req.query?.busca && !req.query?.so ? { teste_busca: (await buscarWeb(String(req.query.busca), 3, { todos: true })).relatorio } : {}),
+    ...(req.query?.busca && req.query?.so ? { resultados: (await buscarWeb(String(req.query.busca), 5, { so: String(req.query.so) })).resultados } : {}),
   });
 }
 

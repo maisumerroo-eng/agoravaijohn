@@ -9,10 +9,10 @@ export const MODELO_LIVE = () => process.env.GEMINI_LIVE || "gemini-3.8-live";
 const FERRAMENTA_BUSCA = {
   functionDeclarations: [{
     name: "pesquisar_web",
-    description: "Pesquisa na internet. Use pra fatos recentes do GTA VI (notas, patches, glitches, missões, segredos) que não estão no banco.",
+    description: "Pesquisa na internet (TikTok primeiro). Use SEMPRE que a resposta não estiver no banco: qualquer fato do GTA VI (segredos, easter eggs, glitches, missões, personagens, notas, patches).",
     parameters: { type: "OBJECT", properties: {
       consulta: { type: "STRING", description: "Termos curtos, de preferência em inglês e com 'GTA 6'." },
-      fonte: { type: "STRING", enum: ["geral", "tiktok", "reddit", "youtube"], description: "tiktok/youtube = vídeos de dicas; reddit = comunidade." },
+      fonte: { type: "STRING", enum: ["tiktok", "geral", "youtube", "reddit"], description: "Padrão: tiktok (fonte principal de dicas, segredos e glitches). geral/youtube/reddit se precisar." },
     }, required: ["consulta"] },
   }],
 };
@@ -27,7 +27,9 @@ MODO AO VIVO:
   importante (estrelas de procurado, missão nova, lugar novo, perigo, morte, oportunidade de dinheiro, item raro), comente
   na hora em 1 ou 2 frases úteis. Se nada importante mudou, fique quieto.
 - Se ele digitar algo, responda do mesmo jeito (falando).
-- Pra pesquisar na internet use a função pesquisar_web (só quando o banco não responde).`;
+- Pra pesquisar use a função pesquisar_web (fonte "tiktok" primeiro; se não achar, "geral").
+- Pesquise SEMPRE que o banco não responder, antes de afirmar qualquer coisa. Pode dizer "peraí que vou ver no TikTok".
+- No máximo 2 pesquisas por pergunta (o jogo é rápido): pesquise uma vez bem feita; só repita se veio nada útil.`;
 
 export function montarSetup({ nome = "John", spoilers = false, voz = "Puck" } = {}) {
   return {
@@ -37,7 +39,8 @@ export function montarSetup({ nome = "John", spoilers = false, voz = "Puck" } = 
       speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: VOZES_GEMINI.includes(voz) ? voz : "Puck" } } },
     },
     systemInstruction: { parts: [{ text: persona(nome, spoilers) + AO_VIVO + "\n\n" + bancoTexto(spoilers) }] },
-    tools: [FERRAMENTA_BUSCA],
+    // Busca do Google só se LIVE_GOOGLE=1 (na chave grátis deu "quota exceeded" e derrubava a sessão).
+    tools: process.env.LIVE_GOOGLE ? [{ googleSearch: {} }, FERRAMENTA_BUSCA] : [FERRAMENTA_BUSCA],
     realtimeInputConfig: {
       automaticActivityDetection: {
         disabled: false,
