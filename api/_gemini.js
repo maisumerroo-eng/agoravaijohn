@@ -3,11 +3,14 @@
 const BASE = process.env.GEMINI_BASE || "https://generativelanguage.googleapis.com/v1beta";
 const PREFERIDOS = [/^gemini-3\.\d+-flash-lite$/, /^gemini-2\.5-flash-lite$/, /^gemini-[\d.]+-flash-lite/, /^gemini-[\d.]+-flash$/];
 
-// Aceita GEMINI_API_KEY ou qualquer variável com "gemini"/"gemenina"/etc. no nome cujo valor pareça chave do Google.
-const chaveEnv = () =>
-  process.env.GEMINI_API_KEY ||
-  Object.entries(process.env).find(([k, v]) => /gem[ei]n/i.test(k) && /^AIza[\w-]{20,}$/.test(String(v).trim()))?.[1]?.trim() ||
-  null;
+// Aceita GEMINI_API_KEY ou qualquer variável com "gemini"/"geminina"/etc. no nome.
+// Limpa aspas, espaços e um eventual "NOME=" colado junto do valor.
+export const limparChave = (v) => String(v || "").trim().replace(/^[\w-]+\s*=\s*/, "").replace(/^["'`]+|["'`;]+$/g, "").trim();
+const chaveEnv = () => {
+  if (process.env.GEMINI_API_KEY) return limparChave(process.env.GEMINI_API_KEY);
+  const achada = Object.entries(process.env).find(([k, v]) => /gem[ei]n/i.test(k) && limparChave(v).length >= 20);
+  return achada ? limparChave(achada[1]) : null;
+};
 export const chaveGemini = (req) => String(req.headers["x-gemini-key"] || "").trim() || chaveEnv();
 
 let modeloCache = null;
