@@ -70,7 +70,7 @@ export default async function handler(req, res) {
         aoTexto: (t) => { if (!comecou) { iniciarStream(); comecou = true; } enviar({ t }); },
       });
       if (!comecou) { iniciarStream(); enviar({ t: r.texto || "Não consegui pensar em nada, repete aí?" }); }
-      enviar({ fim: true, fontes: r.fontes, pesquisou: r.pesquisou });
+      enviar({ fim: true, fontes: r.fontes, pesquisou: r.pesquisou, modelo: r.modelo, buscaIndisponivel: r.buscaIndisponivel });
       return res.end();
     } catch (e) {
       if (comecou) { enviar({ erro: "Caiu no meio da resposta." }); return res.end(); }

@@ -153,7 +153,7 @@ async function conversar(texto) {
   mostrarConversa(texto, "…", []);
   status("Parça pensando…", "lendo");
   const imagem = capturar(768, 0.6);
-  let resposta = "", pendente = "", fontes = [], pesquisou = false;
+  let resposta = "", pendente = "", fontes = [], pesquisou = false, semBusca = "";
   const soltarFrases = (final) => {
     // fala cada frase assim que ela fecha (. ! ?) — não espera a resposta inteira
     const re = /[^.!?…]+[.!?…]+["')\]]*\s+/g;
@@ -186,7 +186,7 @@ async function conversar(texto) {
         const d = JSON.parse(linha);
         if (d.t) { resposta += d.t; pendente += d.t; soltarFrases(false); mostrarConversa(texto, resposta, []); }
         if (d.erro) throw new Error(d.erro);
-        if (d.fim) { fontes = d.fontes || []; pesquisou = !!d.pesquisou; }
+        if (d.fim) { fontes = d.fontes || []; pesquisou = !!d.pesquisou; semBusca = d.buscaIndisponivel || ""; }
       }
     }
     soltarFrases(true);
@@ -195,7 +195,8 @@ async function conversar(texto) {
     conversa = conversa.slice(-16);
     mostrarConversa(texto, resposta, fontes, pesquisou);
     if (!cfg.voz) janelaAte = Date.now() + 12000;
-    status(pesquisou ? "Pesquisou na internet" : "Respondido", "ok");
+    status(pesquisou ? "Pesquisou na internet" : semBusca ? "Sem busca na internet agora" : "Respondido", semBusca ? "pausado" : "ok");
+    if (semBusca) console.warn("Busca indisponível:", semBusca);
   } catch (e) {
     mostrarConversa(texto, "Deu ruim: " + e.message, []);
     status("Erro", "erro");

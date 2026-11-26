@@ -76,8 +76,9 @@ export async function gerarGemini({ chave, system, historico = [], partes, schem
     ...historico.map((h) => ({ role: h.role === "assistant" ? "model" : "user", parts: [{ text: h.content }] })),
     { role: "user", parts: partes.map((p) => (p.imagem ? imagemParte(p.imagem) : { text: p.texto })) },
   ];
+  const AVISO_SEM_BUSCA = "\n\nATENÇÃO: a busca na internet está indisponível agora. NÃO chute números, notas, datas, preços ou fatos que não estão no banco. Se precisar disso, diga curto que não conseguiu pesquisar agora.";
   const montar = (modelo, opc) => ({
-    systemInstruction: { parts: [{ text: system }] },
+    systemInstruction: { parts: [{ text: system + (busca && !opc.busca ? AVISO_SEM_BUSCA : "") }] },
     contents,
     generationConfig: {
       maxOutputTokens: maxTokens,
@@ -89,9 +90,9 @@ export async function gerarGemini({ chave, system, historico = [], partes, schem
   });
 
   const tentativas = [{ pensar: true, busca }, { pensar: false, busca }, ...(busca ? [{ pensar: true, busca: false }, { pensar: false, busca: false }] : [])];
-  let ultimoErro;
+  let ultimoErro, erroBusca = null;
   for (const modelo of modelos) {
-    let r = null;
+    let r = null, opcUsada = null;
     for (const opc of tentativas) {
       const url = `${BASE}/models/${modelo}:${aoTexto ? "streamGenerateContent?alt=sse" : "generateContent"}`;
       const resp = await fetch(url, {
@@ -99,9 +100,10 @@ export async function gerarGemini({ chave, system, historico = [], partes, schem
         headers: { "content-type": "application/json", "x-goog-api-key": chave },
         body: JSON.stringify(montar(modelo, opc)),
       });
-      if (resp.ok) { r = resp; break; }
+      if (resp.ok) { r = resp; opcUsada = opc; break; }
       ultimoErro = await erroGemini(resp);
       ultimoErro.message = `[${modelo}] ${ultimoErro.message}`;
+      if (opc.busca) erroBusca = `${resp.status}: ${ultimoErro.message.slice(0, 140)}`;
       if (resp.status === 400 && !/api key/i.test(ultimoErro.message)) continue; // parâmetro não suportado
       if (resp.status === 429 && opc.busca) continue;                            // talvez só a busca esteja sem cota
       if (resp.status === 429 || resp.status === 404) break;                     // modelo sem cota: próximo modelo
@@ -140,7 +142,7 @@ export async function gerarGemini({ chave, system, historico = [], partes, schem
     } else {
       absorver(await r.json());
     }
-    return { texto: texto.trim(), fontes, pesquisou, modelo };
+    return { texto: texto.trim(), fontes, pesquisou, modelo, buscaIndisponivel: busca && !opcUsada.busca ? erroBusca || "sem busca" : null };
   }
   throw ultimoErro;
 }
