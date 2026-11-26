@@ -135,3 +135,4 @@ video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cov
 .card .fontes a { color: var(--ciano); }
 .card.borrado p { filter: blur(6px); cursor: pointer; }
 .config { max-height: 90dvh; overflow-y: auto; }
+.config label small a { color: var(--ciano); }

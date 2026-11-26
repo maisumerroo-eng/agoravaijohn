@@ -8,7 +8,7 @@ const LS = {
 };
 
 const cfg = {
-  intervalo: LS.get("intervalo", 15),
+  intervalo: LS.get("intervalo", 30),
   foco: LS.get("foco", "tudo"),
   spoilers: LS.get("spoilers", false),
   pular: LS.get("pular", true),
@@ -17,6 +17,8 @@ const cfg = {
   ouvir: LS.get("ouvir", true),
   ativacao: LS.get("ativacao", true),
   nome: LS.get("nome", "John"),
+  gemini: LS.get("gemini", ""),
+  velocidade: LS.get("velocidade", 1.25),
 };
 
 let historico = [];
@@ -64,14 +66,14 @@ document.addEventListener("visibilitychange", () => {
 });
 
 // ---------- Frame ----------
-function capturar() {
+function capturar(max = 1024, qualidade = 0.65) {
   const w = video.videoWidth, h = video.videoHeight;
   if (!w || !h) return null;
-  const escala = Math.min(1, 1280 / Math.max(w, h));
+  const escala = Math.min(1, max / Math.max(w, h));
   canvas.width = Math.round(w * escala);
   canvas.height = Math.round(h * escala);
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL("image/jpeg", 0.72);
+  return canvas.toDataURL("image/jpeg", qualidade);
 }
 
 // Miniatura 32x18 em cinza pra saber se a tela mudou.
@@ -101,6 +103,7 @@ function agendar(ms) {
 const headersIA = () => {
   const h = { "Content-Type": "application/json" };
   if (cfg.chave) h["x-user-key"] = cfg.chave;
+  if (cfg.gemini) h["x-gemini-key"] = cfg.gemini;
   return h;
 };
 
@@ -138,7 +141,7 @@ async function analisar(forcado) {
   }
 }
 
-// ---------- Conversa com o Parça ----------
+// ---------- Conversa com o Parça (streaming: fala já a 1ª frase) ----------
 let pensando = false;
 async function conversar(texto) {
   texto = texto.trim();
@@ -146,28 +149,60 @@ async function conversar(texto) {
   pensando = true;
   ultimaConversa = Date.now();
   speechSynthesis?.cancel();
+  fila.length = 0;
   mostrarConversa(texto, "…", []);
   status("Parça pensando…", "lendo");
-  const imagem = capturar();
+  const imagem = capturar(768, 0.6);
+  let resposta = "", pendente = "", fontes = [], pesquisou = false;
+  const soltarFrases = (final) => {
+    // fala cada frase assim que ela fecha (. ! ?) — não espera a resposta inteira
+    const re = /[^.!?…]+[.!?…]+["')\]]*\s+/g;
+    let m, corte = 0;
+    while ((m = re.exec(pendente))) { falarFila(m[0]); corte = re.lastIndex; }
+    pendente = pendente.slice(corte);
+    if (final && pendente.trim()) { falarFila(pendente); pendente = ""; }
+  };
   try {
     const r = await fetch("/api/conversar", {
       method: "POST",
       headers: headersIA(),
       body: JSON.stringify({ mensagem: texto, historico: conversa, imagem, nome: cfg.nome, spoilers: cfg.spoilers, local: ultimoLocal }),
     });
-    const d = await r.json().catch(() => ({ erro: "Resposta inválida do servidor" }));
-    if (!r.ok) throw new Error(d.erro || "Erro " + r.status);
-    conversa.push({ role: "user", content: texto }, { role: "assistant", content: d.fala });
+    if (!r.ok) {
+      const d = await r.json().catch(() => ({}));
+      throw new Error(d.erro || "Erro " + r.status);
+    }
+    const leitor = r.body.getReader();
+    const dec = new TextDecoder();
+    let buf = "";
+    for (;;) {
+      const { value, done } = await leitor.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let i;
+      while ((i = buf.indexOf("\n")) >= 0) {
+        const linha = buf.slice(0, i); buf = buf.slice(i + 1);
+        if (!linha.trim()) continue;
+        const d = JSON.parse(linha);
+        if (d.t) { resposta += d.t; pendente += d.t; soltarFrases(false); mostrarConversa(texto, resposta, []); }
+        if (d.erro) throw new Error(d.erro);
+        if (d.fim) { fontes = d.fontes || []; pesquisou = !!d.pesquisou; }
+      }
+    }
+    soltarFrases(true);
+    resposta = resposta.trim() || "Não consegui pensar em nada, repete aí?";
+    conversa.push({ role: "user", content: texto }, { role: "assistant", content: resposta });
     conversa = conversa.slice(-16);
-    mostrarConversa(texto, d.fala, d.fontes || [], d.pesquisou);
-    falarConversa(d.fala);
-    status(d.pesquisou ? "Pesquisou na internet" : "Respondido", "ok");
+    mostrarConversa(texto, resposta, fontes, pesquisou);
+    if (!cfg.voz) janelaAte = Date.now() + 12000;
+    status(pesquisou ? "Pesquisou na internet" : "Respondido", "ok");
   } catch (e) {
     mostrarConversa(texto, "Deu ruim: " + e.message, []);
     status("Erro", "erro");
   } finally {
     pensando = false;
     ultimaConversa = Date.now();
+    if (!fila.length && !speechSynthesis?.speaking) { janelaAte = Date.now() + 12000; if (cfg.ouvir) setTimeout(ouvir, 200); }
   }
 }
 
@@ -244,23 +279,45 @@ if ("speechSynthesis" in window) {
   escolherVoz();
   speechSynthesis.onvoiceschanged = escolherVoz;
 }
-function falarBase(txt, aoTerminar) {
-  if (!cfg.voz || !txt || !("speechSynthesis" in window)) return aoTerminar?.();
-  speechSynthesis.cancel();
+function novaFala(txt) {
   const u = new SpeechSynthesisUtterance(txt);
   u.lang = "pt-BR";
   if (vozPt) u.voice = vozPt;
-  u.rate = 1.08;
+  u.rate = Number(cfg.velocidade) || 1.25;   // rápido, mas dá pra entender
+  return u;
+}
+function falarBase(txt, aoTerminar) {
+  if (!cfg.voz || !txt || !("speechSynthesis" in window)) return aoTerminar?.();
+  speechSynthesis.cancel();
+  fila.length = 0;
+  const u = novaFala(txt);
   u.onstart = () => pararOuvir(true);           // não ouvir a própria voz
-  u.onend = u.onerror = () => { aoTerminar?.(); if (cfg.ouvir) setTimeout(ouvir, 250); };
+  u.onend = u.onerror = () => { aoTerminar?.(); if (cfg.ouvir) setTimeout(ouvir, 200); };
+  speechSynthesis.speak(u);
+}
+// Fila pras frases que chegam em streaming na conversa.
+const fila = [];
+function falarFila(txt) {
+  txt = txt.trim();
+  if (!cfg.voz || !txt || !("speechSynthesis" in window)) return;
+  const u = novaFala(txt);
+  fila.push(u);
+  u.onstart = () => pararOuvir(true);
+  u.onend = u.onerror = () => {
+    fila.splice(fila.indexOf(u), 1);
+    if (!fila.length && !pensando) {            // acabou de falar tudo
+      janelaAte = Date.now() + 12000;
+      if (cfg.ouvir) setTimeout(ouvir, 200);
+    }
+  };
   speechSynthesis.speak(u);
 }
 // Dica automática: não atropela conversa recente.
 function falar(txt) {
-  if (pensando || Date.now() - ultimaConversa < 25000 || speechSynthesis?.speaking) return;
+  if (pensando || fila.length || Date.now() - ultimaConversa < 25000 || speechSynthesis?.speaking) return;
   falarBase(txt);
 }
-// Resposta da conversa: depois dela, 12 s pra responder sem dizer "parça".
+// Fala avulsa do Parça (ex.: "Fala, John!"): depois dela, 12 s pra responder sem dizer "parça".
 function falarConversa(txt) {
   falarBase(txt, () => { janelaAte = Date.now() + 12000; });
   if (!cfg.voz) janelaAte = Date.now() + 12000;
@@ -359,7 +416,7 @@ $("btnPausa").addEventListener("click", () => {
   if (pausado) { clearTimeout(timer); status("Pausado", "pausado"); } else agendar(300);
 });
 
-const CAMPOS = { intervalo: "cfgIntervalo", foco: "cfgFoco", spoilers: "cfgSpoilers", pular: "cfgPular", chave: "cfgChave", ouvir: "cfgOuvir", ativacao: "cfgAtivacao", nome: "cfgNome" };
+const CAMPOS = { gemini: "cfgGemini", velocidade: "cfgVelocidade", intervalo: "cfgIntervalo", foco: "cfgFoco", spoilers: "cfgSpoilers", pular: "cfgPular", chave: "cfgChave", ouvir: "cfgOuvir", ativacao: "cfgAtivacao", nome: "cfgNome" };
 const dlg = $("config");
 $("btnConfig").addEventListener("click", () => {
   for (const [k, id] of Object.entries(CAMPOS)) {
@@ -371,7 +428,7 @@ $("btnConfig").addEventListener("click", () => {
 dlg.addEventListener("close", () => {
   for (const [k, id] of Object.entries(CAMPOS)) {
     const el = $(id);
-    cfg[k] = el.type === "checkbox" ? el.checked : k === "intervalo" ? Number(el.value) : el.value.trim();
+    cfg[k] = el.type === "checkbox" ? el.checked : k === "intervalo" || k === "velocidade" ? Number(el.value) : el.value.trim();
     LS.set(k, cfg[k]);
   }
   if (!cfg.nome) cfg.nome = "John";

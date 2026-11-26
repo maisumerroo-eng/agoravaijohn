@@ -1,5 +1,6 @@
 // Recebe um frame da câmera (foto da TV com o jogo) e devolve dicas em JSON.
 import { criarCliente, bancoTexto, erroIA, limparImagem } from "./_ia.js";
+import { chaveGemini, gerarGemini, respostaErroGemini } from "./_gemini.js";
 
 const SYSTEM = `Você é o "Copiloto", um parceiro de jogo que assiste a partida de GTA VI junto com o jogador.
 O jogador apontou a câmera do celular para a TV/monitor. A imagem pode estar torta, com reflexo, moiré ou desfocada.
@@ -13,7 +14,8 @@ O que entregar:
 - dica: 1 dica prática pro momento exato (combate, fuga da polícia, direção, missão, economia).
 - curiosidade: 1 fato curto e interessante ligado ao que aparece (lugar real que inspirou, cultura da Flórida, detalhe da série GTA). Sem spoiler de história, a menos que o jogador permita.
 - perto: até 3 coisas pra fazer por perto, baseadas no que aparece no minimapa/cenário (ícones, lojas, praia, água, estrada, eventos). Se não houver pistas, sugira atividades típicas do tipo de área.
-- fala: 1 frase curta (máx 20 palavras), tom de parceiro de jogo, pra ser lida em voz alta.
+- fala: 1 frase CURTA (máx 12 palavras), direto ao ponto, tom de parceiro de jogo, pra ser lida em voz alta rápido.
+- dica/curiosidade/detalhe: frases curtas, sem enrolação (o jogo é rápido).
 - Não repita dicas já dadas (lista em "já falei").
 - Se a imagem não for uma tela de jogo (ou for menu/carregamento), marque tela_de_jogo=false e use os campos pra uma dica curta geral.
 - Use o BANCO DE CONHECIMENTO abaixo como fonte principal. Itens "NÃO CONFIRMADO" só com aviso.
@@ -45,9 +47,6 @@ const SCHEMA = {
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ erro: "Use POST" });
 
-  const ia = criarCliente(req);
-  if (!ia) return res.status(401).json({ erro: "Sem acesso à IA. Publique na Vercel (AI Gateway) ou cole uma chave nas configurações." });
-
   const { imagem, historico = [], pergunta = "", spoilers = false, foco = "tudo" } = req.body || {};
   const data = limparImagem(imagem);
   if (!data) return res.status(400).json({ erro: "Faltou a imagem (ou é grande demais)" });
@@ -59,10 +58,30 @@ export default async function handler(req, res) {
     pergunta ? `Pergunta do jogador (responda na dica e na fala): ${pergunta}` : "",
   ].filter(Boolean).join("\n");
 
+  const gkey = chaveGemini(req);
+  if (gkey && !String(req.headers["x-user-key"] || "").startsWith("sk-ant-")) {
+    try {
+      const r = await gerarGemini({
+        chave: gkey,
+        system: SYSTEM + "\n\n" + bancoTexto(spoilers),
+        partes: [{ imagem: data }, { texto: contexto }],
+        schema: SCHEMA,
+        maxTokens: 700,
+      });
+      return res.status(200).json(JSON.parse(r.texto.slice(r.texto.indexOf("{"), r.texto.lastIndexOf("}") + 1)));
+    } catch (e) {
+      if (e instanceof SyntaxError) return res.status(502).json({ erro: "Resposta do Gemini veio quebrada." });
+      return respostaErroGemini(e, res);
+    }
+  }
+
+  const ia = criarCliente(req);
+  if (!ia) return res.status(401).json({ erro: "Sem acesso à IA. Publique na Vercel (AI Gateway) ou cole uma chave nas configurações." });
+
   try {
     const response = await ia.client.messages.create({
       model: ia.modelo,
-      max_tokens: 4000,
+      max_tokens: 2000,
       output_config: { effort: "low", format: { type: "json_schema", schema: SCHEMA } },
       system: [
         { type: "text", text: SYSTEM },

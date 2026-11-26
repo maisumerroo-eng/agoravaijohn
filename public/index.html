@@ -58,11 +58,23 @@
   <dialog id="config" class="config">
     <form method="dialog">
       <h2>Configurações</h2>
+      <label>Chave grátis do Gemini (Google, sem cartão) — fica só neste celular
+        <input id="cfgGemini" type="password" placeholder="AIza…" autocomplete="off">
+        <small><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Pegar chave grátis no Google AI Studio</a></small>
+      </label>
+      <label>Velocidade da voz
+        <select id="cfgVelocidade">
+          <option value="1">Normal</option>
+          <option value="1.15">Um pouco rápida</option>
+          <option value="1.25">Rápida</option>
+          <option value="1.4">Bem rápida</option>
+        </select>
+      </label>
       <label>Intervalo entre leituras
         <select id="cfgIntervalo">
           <option value="8">8 s (gasta mais)</option>
-          <option value="15" selected>15 s</option>
-          <option value="30">30 s</option>
+          <option value="15">15 s</option>
+          <option value="30" selected>30 s</option>
           <option value="60">60 s</option>
           <option value="0">Só manual</option>
         </select>
