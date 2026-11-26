@@ -39,7 +39,7 @@ async function erroGemini(r) {
 
 export function respostaErroGemini(e, res, chave = "") {
   const msg = String(e.message || "").slice(0, 200);
-  if (/^vck_/.test(chave)) return res.status(401).json({ erro: "Essa chave é da Vercel (vck_), não do Google. Pegue a do Gemini (começa com AIza) em aistudio.google.com/apikey." });
+  if (/^vck_/.test(chave)) return res.status(401).json({ erro: "Essa chave é da Vercel (vck_), não do Google. Pegue a do Gemini em aistudio.google.com/apikey." });
   if (e.status === 429) return res.status(429).json({ erro: "Limite grátis do Google atingido (por minuto ou do dia). Espera um pouco ou aumenta o intervalo." });
   if (e.status === 400 && /api key/i.test(msg)) return res.status(401).json({ erro: "Chave do Gemini inválida." });
   if (e.status === 403) return res.status(401).json({ erro: "Chave do Gemini sem permissão: " + msg });
