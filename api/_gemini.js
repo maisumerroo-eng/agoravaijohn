@@ -237,8 +237,9 @@ export async function falarGemini({ chave, texto, voz = "Puck" }) {
   const lista = await listarTTS(chave);
   const modelos = ttsBom && lista.includes(ttsBom) ? [ttsBom, ...lista.filter((m) => m !== ttsBom)] : lista;
   const corpo = {
-    contents: [{ role: "user", parts: [{ text: `Leia em português do Brasil, com sotaque brasileiro, voz de amigo animado e bem claro, ritmo natural: ${texto}` }] }],
-    generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: nomeVoz } } } },
+    // Só o texto (instrução junto era lida em voz alta). Idioma vai no languageCode.
+    contents: [{ role: "user", parts: [{ text: texto }] }],
+    generationConfig: { responseModalities: ["AUDIO"], speechConfig: { languageCode: "pt-BR", voiceConfig: { prebuiltVoiceConfig: { voiceName: nomeVoz } } } },
   };
   let ultimoErro;
   for (const modelo of modelos) {
