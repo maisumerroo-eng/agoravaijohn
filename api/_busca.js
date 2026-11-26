@@ -20,6 +20,19 @@ async function pegar(url, opcoes = {}) {
   }
 }
 
+// Link do Bing vem embrulhado (bing.com/ck/a?...&u=a1<base64url>): desembrulha pro site real.
+function linkBing(href) {
+  try {
+    const u = new URL(href.replace(/&amp;/g, "&"));
+    const enc = u.searchParams.get("u");
+    if (/bing\.com$/.test(u.hostname) && enc?.startsWith("a1")) {
+      const b64 = enc.slice(2).replace(/-/g, "+").replace(/_/g, "/");
+      return atob(b64 + "===".slice((b64.length + 3) % 4));
+    }
+    return u.href;
+  } catch { return href; }
+}
+
 const BUSCADORES = {
   bing: async (q) => {
     const { status, html } = await pegar(`https://www.bing.com/search?q=${encodeURIComponent(q)}&setlang=pt-br&cc=br`);
@@ -27,7 +40,7 @@ const BUSCADORES = {
     for (const bloco of html.split('<li class="b_algo"').slice(1)) {
       const a = bloco.match(/<h2[^>]*>\s*<a[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/);
       const p = bloco.match(/<p[^>]*>([\s\S]*?)<\/p>/) || bloco.match(/class="b_lineclamp\d"[^>]*>([\s\S]*?)<\/(?:p|div)>/);
-      if (a && /^https?:/.test(a[1])) res.push({ titulo: limpar(a[2]), url: a[1].replace(/&amp;/g, "&"), trecho: limpar(p?.[1]).slice(0, 300) });
+      if (a && /^https?:/.test(a[1])) res.push({ titulo: limpar(a[2]), url: linkBing(a[1]), trecho: limpar(p?.[1]).slice(0, 300) });
     }
     return { status, res };
   },
@@ -59,7 +72,7 @@ const BUSCADORES = {
   },
 };
 
-let preferido = null; // o que funcionou por último vai primeiro
+let preferido = "bing"; // o que funcionou por último vai primeiro
 
 export async function buscarWeb(consulta, max = 5, { todos = false } = {}) {
   const ordem = Object.keys(BUSCADORES).sort((a, b) => (a === preferido ? -1 : b === preferido ? 1 : 0));

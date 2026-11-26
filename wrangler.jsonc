@@ -1,0 +1,8 @@
+{
+  // Cloudflare Workers (grátis, sem cartão): https://agoravaijohn.maisumerroo.workers.dev
+  "name": "agoravaijohn",
+  "main": "worker.js",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true }
+}

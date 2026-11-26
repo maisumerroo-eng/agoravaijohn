@@ -1,6 +1,7 @@
 // Gemini (Google AI Studio) via REST — plano grátis sem cartão. Usa os modelos Flash-Lite (mais rápidos
 // e com mais cota grátis). A chave vem da env GEMINI_API_KEY ou do header x-gemini-key (configurações do app).
-const BASE = process.env.GEMINI_BASE || "https://generativelanguage.googleapis.com/v1beta";
+const BASE_PADRAO = "https://generativelanguage.googleapis.com/v1beta";
+const base = () => process.env.GEMINI_BASE || BASE_PADRAO; // lido na hora (Cloudflare preenche o env por requisição)
 const PREFERIDOS = [/^gemini-3\.\d+-flash-lite$/, /^gemini-2\.5-flash-lite$/, /^gemini-[\d.]+-flash-lite/, /^gemini-[\d.]+-flash$/];
 
 // Aceita GEMINI_API_KEY ou qualquer variável com "gemini"/"geminina"/etc. no nome.
@@ -8,7 +9,8 @@ const PREFERIDOS = [/^gemini-3\.\d+-flash-lite$/, /^gemini-2\.5-flash-lite$/, /^
 export const limparChave = (v) => String(v || "").trim().replace(/^[\w-]+\s*=\s*/, "").replace(/^["'`]+|["'`;]+$/g, "").trim();
 const chaveEnv = () => {
   if (process.env.GEMINI_API_KEY) return limparChave(process.env.GEMINI_API_KEY);
-  const achada = Object.entries(process.env).find(([k, v]) => /gem[ei]n/i.test(k) && limparChave(v).length >= 20);
+  const achada = Object.entries(process.env).find(([k, v]) =>
+    /gem[ei]n/i.test(k) && !/BASE|MODELO|TTS|PENSAMENTO/i.test(k) && !/^https?:/i.test(String(v)) && limparChave(v).length >= 20);
   return achada ? limparChave(achada[1]) : null;
 };
 export const chaveGemini = (req) => String(req.headers["x-gemini-key"] || "").trim() || chaveEnv();
@@ -18,7 +20,7 @@ let listaCache = null, modeloBom = null, buscaBloqueadaAte = 0;
 async function listarModelos(chave) {
   if (process.env.GEMINI_MODELO) return [process.env.GEMINI_MODELO];
   if (listaCache && Date.now() - listaCache.em < 6 * 3600e3) return listaCache.nomes;
-  const r = await fetch(`${BASE}/models?pageSize=200`, { headers: { "x-goog-api-key": chave } });
+  const r = await fetch(`${base()}/models?pageSize=200`, { headers: { "x-goog-api-key": chave } });
   if (!r.ok) throw await erroGemini(r);
   const { models = [] } = await r.json();
   const nomes = models
@@ -49,9 +51,9 @@ export function respostaErroGemini(e, res, chave = "") {
 
 // Pensamento BAIXO (padrão): o jogo é rápido, prioriza velocidade. Muda com a env GEMINI_PENSAMENTO
 // (minimal | low | medium | high). Gemini 3 usa thinkingLevel; 2.5 usa thinkingBudget.
-const NIVEL = process.env.GEMINI_PENSAMENTO || "low";
+const nivel = () => process.env.GEMINI_PENSAMENTO || "low";
 const ORCAMENTO_25 = { minimal: 0, low: 512, medium: 2048, high: 8192 };
-const pensar = (m) => (/^gemini-2\./.test(m) ? { thinkingBudget: ORCAMENTO_25[NIVEL] ?? 512 } : { thinkingLevel: NIVEL });
+const pensar = (m) => (/^gemini-2\./.test(m) ? { thinkingBudget: ORCAMENTO_25[nivel()] ?? 512 } : { thinkingLevel: nivel() });
 
 // JSON Schema (o do Claude) -> schema OpenAPI que o Gemini aceita.
 export function paraSchemaGemini(s) {
@@ -132,7 +134,7 @@ export async function gerarGemini({ chave, system, historico = [], partes, schem
     ...(opc.busca === "google" ? { tools: [{ google_search: {} }] } : opc.busca === "funcao" ? { tools: [FERRAMENTA_BUSCA] } : {}),
   });
   const chamar = (modelo, opc, extra) =>
-    fetch(`${BASE}/models/${modelo}:${aoTexto ? "streamGenerateContent?alt=sse" : "generateContent"}`, {
+    fetch(`${base()}/models/${modelo}:${aoTexto ? "streamGenerateContent?alt=sse" : "generateContent"}`, {
       method: "POST",
       headers: { "content-type": "application/json", "x-goog-api-key": chave },
       body: JSON.stringify(montar(modelo, opc, extra)),
@@ -184,4 +186,76 @@ export async function gerarGemini({ chave, system, historico = [], partes, schem
       buscaIndisponivel: busca && !opcUsada.busca ? erroBusca || "sem busca" : null };
   }
   throw ultimoErro;
+}
+
+// ---------- Voz de IA (Gemini TTS): fala quase humana em pt-BR ----------
+export const VOZES_GEMINI = ["Puck", "Fenrir", "Charon", "Orus", "Kore", "Aoede", "Leda", "Zephyr"];
+let ttsCache = null, ttsBom = null;
+async function listarTTS(chave) {
+  if (process.env.GEMINI_TTS) return [process.env.GEMINI_TTS];
+  if (ttsCache && Date.now() - ttsCache.em < 6 * 3600e3) return ttsCache.nomes;
+  const r = await fetch(`${base()}/models?pageSize=200`, { headers: { "x-goog-api-key": chave } });
+  if (!r.ok) throw await erroGemini(r);
+  const { models = [] } = await r.json();
+  const nomes = models.map((m) => m.name.replace(/^models\//, "")).filter((n) => /tts/i.test(n));
+  // Flash-Lite TTS primeiro (mais rápido / mais cota), depois Flash; versões novas antes.
+  nomes.sort((a, b) => (/lite/.test(b) - /lite/.test(a)) || b.localeCompare(a));
+  if (!nomes.length) throw Object.assign(new Error("Nenhum modelo de voz (TTS) disponível pra essa chave."), { status: 404 });
+  ttsCache = { nomes: nomes.slice(0, 4), em: Date.now() };
+  return ttsCache.nomes;
+}
+
+// PCM 16-bit mono -> WAV (o navegador toca direto).
+function pcmParaWav(pcm, taxa = 24000) {
+  const wav = new Uint8Array(44 + pcm.length);
+  const v = new DataView(wav.buffer);
+  const txt = (o, s) => [...s].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+  txt(0, "RIFF"); v.setUint32(4, 36 + pcm.length, true); txt(8, "WAVE");
+  txt(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, taxa, true); v.setUint32(28, taxa * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  txt(36, "data"); v.setUint32(40, pcm.length, true);
+  wav.set(pcm, 44);
+  return wav;
+}
+
+const b64ParaBytes = (b64) => {
+  const bin = atob(b64);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+};
+
+export async function falarGemini({ chave, texto, voz = "Puck" }) {
+  texto = String(texto || "").replace(/\s+/g, " ").trim().slice(0, 800);
+  if (!texto) throw Object.assign(new Error("texto vazio"), { status: 400 });
+  const nomeVoz = VOZES_GEMINI.includes(voz) ? voz : "Puck";
+  const lista = await listarTTS(chave);
+  const modelos = ttsBom && lista.includes(ttsBom) ? [ttsBom, ...lista.filter((m) => m !== ttsBom)] : lista;
+  const corpo = {
+    contents: [{ role: "user", parts: [{ text: `Leia em português do Brasil, com sotaque brasileiro, voz de amigo animado e bem claro, ritmo natural: ${texto}` }] }],
+    generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: nomeVoz } } } },
+  };
+  let ultimoErro;
+  for (const modelo of modelos) {
+    const r = await fetch(`${base()}/models/${modelo}:generateContent`, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-goog-api-key": chave },
+      body: JSON.stringify(corpo),
+    });
+    if (!r.ok) {
+      ultimoErro = await erroGemini(r);
+      ultimoErro.message = `[${modelo}] ${ultimoErro.message}`;
+      if (r.status === 429 || r.status === 404 || r.status === 400) continue;
+      throw ultimoErro;
+    }
+    const j = await r.json();
+    const parte = j.candidates?.[0]?.content?.parts?.find((p) => p.inlineData || p.inline_data);
+    const dados = parte?.inlineData || parte?.inline_data;
+    if (!dados?.data) { ultimoErro = new Error(`[${modelo}] veio sem áudio`); continue; }
+    ttsBom = modelo;
+    const taxa = Number(/rate=(\d+)/.exec(dados.mimeType || dados.mime_type || "")?.[1]) || 24000;
+    const bytes = b64ParaBytes(dados.data);
+    return /wav|mpeg|mp3|ogg/.test(dados.mimeType || "") ? { audio: bytes, tipo: dados.mimeType } : { audio: pcmParaWav(bytes, taxa), tipo: "audio/wav" };
+  }
+  throw ultimoErro || new Error("voz indisponível");
 }

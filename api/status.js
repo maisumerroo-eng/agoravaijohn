@@ -2,7 +2,7 @@
 import { limparChave } from "./_gemini.js";
 import { buscarWeb } from "./_busca.js";
 export default async function handler(req, res) {
-  const gem = Object.keys(process.env).filter((k) => /gem[ei]n/i.test(k));
+  const gem = Object.keys(process.env).filter((k) => /gem[ei]n/i.test(k) && !/BASE|MODELO|TTS|PENSAMENTO/i.test(k));
   const formato = Object.fromEntries(gem.map((k) => {
     const bruto = String(process.env[k] || "");
     const v = limparChave(bruto);
@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   }));
   res.setHeader("Cache-Control", "no-store");
   res.status(200).json({
-    versao: "2026-11-26h",
+    versao: "2026-11-27-cf1",
     ia: gem.some((k) => limparChave(process.env[k]).length >= 20) ? "gemini" : process.env.ANTHROPIC_API_KEY ? "anthropic" : "vercel-ai-gateway",
     variaveis_gemini: formato,
     ambiente: process.env.VERCEL_ENV || "local",

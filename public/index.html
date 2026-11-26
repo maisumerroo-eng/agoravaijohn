@@ -62,14 +62,28 @@
         <input id="cfgGemini" type="password" placeholder="Cole a chave do Google AI Studio" autocomplete="off">
         <small><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Pegar chave grátis no Google AI Studio</a></small>
       </label>
-      <label>Velocidade da voz
-        <select id="cfgVelocidade">
-          <option value="1">Normal</option>
-          <option value="1.15">Um pouco rápida</option>
-          <option value="1.25">Rápida</option>
-          <option value="1.4">Bem rápida</option>
+      <label class="linha"><input id="cfgVozIA" type="checkbox" checked> Voz de IA quase humana (Gemini). Desligado = voz do celular</label>
+      <label>Voz do Parça
+        <select id="cfgVozNome">
+          <option value="Puck">Puck — animado (padrão)</option>
+          <option value="Fenrir">Fenrir — empolgado</option>
+          <option value="Orus">Orus — firme</option>
+          <option value="Charon">Charon — calmo, explicativo</option>
+          <option value="Kore">Kore — feminina, firme</option>
+          <option value="Aoede">Aoede — feminina, leve</option>
+          <option value="Leda">Leda — feminina, jovem</option>
+          <option value="Zephyr">Zephyr — feminina, clara</option>
         </select>
       </label>
+      <label>Velocidade da voz
+        <select id="cfgVelocidade">
+          <option value="0.95">Calma</option>
+          <option value="1">Normal (mais clara)</option>
+          <option value="1.1">Um pouco rápida</option>
+          <option value="1.2">Rápida</option>
+        </select>
+      </label>
+      <button type="button" id="btnTestarVoz" class="btn-secundario">▶ Testar voz</button>
       <label>Intervalo entre leituras
         <select id="cfgIntervalo">
           <option value="8">8 s (gasta mais)</option>

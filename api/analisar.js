@@ -14,7 +14,7 @@ O que entregar:
 - dica: 1 dica prática pro momento exato (combate, fuga da polícia, direção, missão, economia).
 - curiosidade: 1 fato curto e interessante ligado ao que aparece (lugar real que inspirou, cultura da Flórida, detalhe da série GTA). Sem spoiler de história, a menos que o jogador permita.
 - perto: até 3 coisas pra fazer por perto, baseadas no que aparece no minimapa/cenário (ícones, lojas, praia, água, estrada, eventos). Se não houver pistas, sugira atividades típicas do tipo de área.
-- fala: 1 frase CURTA (máx 12 palavras), direto ao ponto, tom de parceiro de jogo, pra ser lida em voz alta rápido.
+- fala: 1 ou 2 frases curtas e claras (até ~25 palavras) explicando o que fazer agora e onde, tom de amigo, pra ser lida em voz alta.
 - dica/curiosidade/detalhe: frases curtas, sem enrolação (o jogo é rápido).
 - Não repita dicas já dadas (lista em "já falei").
 - Se a imagem não for uma tela de jogo (ou for menu/carregamento), marque tela_de_jogo=false e use os campos pra uma dica curta geral.

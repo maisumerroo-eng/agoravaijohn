@@ -2,6 +2,11 @@
   "name": "gta-copiloto",
   "private": true,
   "type": "module",
-  "scripts": { "dev": "node dev.js" },
-  "dependencies": { "@anthropic-ai/sdk": "^1.14.0" }
+  "scripts": {
+    "dev": "node dev.js",
+    "deploy": "node gerar-static.mjs && npx -y wrangler@4.168.0 deploy"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.14.0"
+  }
 }

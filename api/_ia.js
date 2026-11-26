@@ -1,10 +1,9 @@
 // Compartilhado: cliente da IA (Vercel AI Gateway ou chave própria) + banco do GTA VI.
 import Anthropic from "@anthropic-ai/sdk";
-import { readFileSync } from "node:fs";
+import BANCO from "../public/gta6.json" with { type: "json" };
 
 export { Anthropic };
 
-const BANCO = JSON.parse(readFileSync(new URL("../public/gta6.json", import.meta.url), "utf8"));
 const linha = (i) =>
   `[${i.tipo}] ${i.nome}${i.tags?.length ? ` (${i.tags.join(", ")})` : ""}: ${i.texto}` +
   `${i.confirmado === false ? " (NÃO CONFIRMADO)" : ""}${i.spoiler ? " (SPOILER)" : ""}`;

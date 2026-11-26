@@ -18,7 +18,9 @@ const cfg = {
   ativacao: LS.get("ativacao", true),
   nome: LS.get("nome", "John"),
   gemini: LS.get("gemini", ""),
-  velocidade: LS.get("velocidade", 1.25),
+  velocidade: LS.get("velocidade", 1),
+  vozIA: LS.get("vozIA", true),
+  vozNome: LS.get("vozNome", "Puck"),
 };
 
 let historico = [];
@@ -148,8 +150,7 @@ async function conversar(texto) {
   if (!texto || pensando) return;
   pensando = true;
   ultimaConversa = Date.now();
-  speechSynthesis?.cancel();
-  fila.length = 0;
+  pararFala();
   mostrarConversa(texto, "…", []);
   status("Parça pensando…", "lendo");
   const imagem = capturar(768, 0.6);
@@ -203,7 +204,7 @@ async function conversar(texto) {
   } finally {
     pensando = false;
     ultimaConversa = Date.now();
-    if (!fila.length && !speechSynthesis?.speaking) { janelaAte = Date.now() + 12000; if (cfg.ouvir) setTimeout(ouvir, 200); }
+    if (!falando()) { janelaAte = Date.now() + 12000; if (cfg.ouvir) setTimeout(ouvir, 200); }
   }
 }
 
@@ -272,53 +273,120 @@ function mostrarErro(msg) {
 let vozPt = null;
 function escolherVoz() {
   const vozes = speechSynthesis.getVoices().filter((v) => v.lang.replace("_", "-").startsWith("pt"));
-  // Prefere vozes naturais/online do pt-BR.
-  vozPt = vozes.find((v) => /pt-BR/.test(v.lang) && /natural|google|online|neural/i.test(v.name))
+  // Melhor voz do celular: Google/neural/online pt-BR (bem melhor que as vozes "offline" robóticas).
+  vozPt = vozes.find((v) => /pt-BR/.test(v.lang) && /google/i.test(v.name))
+    || vozes.find((v) => /pt-BR/.test(v.lang) && /natural|online|neural|enhanced|premium/i.test(v.name))
     || vozes.find((v) => /pt-BR/.test(v.lang)) || vozes[0] || null;
 }
 if ("speechSynthesis" in window) {
   escolherVoz();
   speechSynthesis.onvoiceschanged = escolherVoz;
 }
-function novaFala(txt) {
-  const u = new SpeechSynthesisUtterance(txt);
-  u.lang = "pt-BR";
-  if (vozPt) u.voice = vozPt;
-  u.rate = Number(cfg.velocidade) || 1.25;   // rápido, mas dá pra entender
-  return u;
+
+// ---------- Motor de fala: voz de IA (Gemini) com reserva na voz do celular ----------
+// Fila de frases; o áudio da próxima é buscado enquanto a atual toca.
+const fila = [];               // [{texto, audio: Promise<Blob|null>}]
+let tocando = null;            // item atual
+let player = new Audio();
+let vozIAPausadaAte = 0;       // se a voz de IA falhar (ex.: cota), usa a do celular por 5 min
+let aoAcabarFila = null;
+
+const usarVozIA = () => cfg.vozIA && Date.now() > vozIAPausadaAte;
+const falando = () => !!tocando || fila.length > 0 || !!speechSynthesis?.speaking;
+
+function buscarAudio(texto) {
+  if (!usarVozIA()) return Promise.resolve(null);
+  return fetch("/api/voz", { method: "POST", headers: headersIA(), body: JSON.stringify({ texto, voz: cfg.vozNome }) })
+    .then(async (r) => {
+      if (!r.ok) {
+        const e = await r.json().catch(() => ({}));
+        vozIAPausadaAte = Date.now() + 5 * 60e3;
+        console.warn("Voz de IA indisponível, usando a do celular:", e.erro || r.status);
+        return null;
+      }
+      return r.blob();
+    })
+    .catch(() => null);
 }
-function falarBase(txt, aoTerminar) {
-  if (!cfg.voz || !txt || !("speechSynthesis" in window)) return aoTerminar?.();
-  speechSynthesis.cancel();
+
+function falarNoCelular(texto) {
+  return new Promise((ok) => {
+    if (!("speechSynthesis" in window)) return ok();
+    const u = new SpeechSynthesisUtterance(texto);
+    u.lang = "pt-BR";
+    if (vozPt) u.voice = vozPt;
+    u.rate = Number(cfg.velocidade) || 1;
+    u.onend = u.onerror = () => ok();
+    speechSynthesis.speak(u);
+  });
+}
+
+function tocarBlob(blob) {
+  return new Promise((ok) => {
+    const url = URL.createObjectURL(blob);
+    player.src = url;
+    player.playbackRate = Math.min(1.25, Math.max(0.9, Number(cfg.velocidade) || 1));
+    player.onended = player.onerror = () => { URL.revokeObjectURL(url); ok(); };
+    player.play().catch(() => { URL.revokeObjectURL(url); ok("falhou"); });
+  });
+}
+
+let rodando = false, geracao = 0;
+async function rodarFila() {
+  if (rodando) return;
+  rodando = true;
+  const g = geracao;
+  while (fila.length && g === geracao) {
+    const item = fila.shift();
+    tocando = item;
+    pararOuvir(true);                          // não ouvir a própria voz
+    const blob = await item.audio;
+    if (g !== geracao) return;                 // interrompido: outro tocador assume
+    const r = blob ? await tocarBlob(blob) : "sem-ia";
+    if (g !== geracao) return;
+    if (r) await falarNoCelular(item.texto);   // reserva: voz do celular
+    if (g !== geracao) return;
+  }
+  tocando = null;
+  rodando = false;
+  const fim = aoAcabarFila; aoAcabarFila = null;
+  fim?.();
+  if (!pensando) {
+    janelaAte = Date.now() + 12000;
+    if (cfg.ouvir) setTimeout(ouvir, 200);
+  }
+}
+
+function pararFala() {
+  geracao++;
   fila.length = 0;
-  const u = novaFala(txt);
-  u.onstart = () => pararOuvir(true);           // não ouvir a própria voz
-  u.onend = u.onerror = () => { aoTerminar?.(); if (cfg.ouvir) setTimeout(ouvir, 200); };
-  speechSynthesis.speak(u);
+  tocando = null;
+  rodando = false;
+  aoAcabarFila = null;
+  try { player.pause(); player.onended?.(); } catch {}
+  try { speechSynthesis.cancel(); } catch {}
 }
-// Fila pras frases que chegam em streaming na conversa.
-const fila = [];
+
+// Põe uma frase na fila (usado no streaming da conversa).
 function falarFila(txt) {
-  txt = txt.trim();
-  if (!cfg.voz || !txt || !("speechSynthesis" in window)) return;
-  const u = novaFala(txt);
-  fila.push(u);
-  u.onstart = () => pararOuvir(true);
-  u.onend = u.onerror = () => {
-    fila.splice(fila.indexOf(u), 1);
-    if (!fila.length && !pensando) {            // acabou de falar tudo
-      janelaAte = Date.now() + 12000;
-      if (cfg.ouvir) setTimeout(ouvir, 200);
-    }
-  };
-  speechSynthesis.speak(u);
+  txt = String(txt || "").trim();
+  if (!cfg.voz || !txt) return;
+  fila.push({ texto: txt, audio: buscarAudio(txt) });
+  rodarFila();
+}
+// Fala avulsa (interrompe o que estiver falando).
+function falarBase(txt, aoTerminar) {
+  if (!cfg.voz || !txt) return aoTerminar?.();
+  pararFala();
+  falarFila(txt);
+  aoAcabarFila = aoTerminar;
 }
 // Dica automática: não atropela conversa recente.
 function falar(txt) {
-  if (pensando || fila.length || Date.now() - ultimaConversa < 25000 || speechSynthesis?.speaking) return;
+  if (pensando || falando() || Date.now() - ultimaConversa < 25000) return;
   falarBase(txt);
 }
-// Fala avulsa do Parça (ex.: "Fala, John!"): depois dela, 12 s pra responder sem dizer "parça".
+// Fala do Parça fora do streaming (ex.: "Fala, John!"): depois dela, 12 s pra responder sem dizer "parça".
 function falarConversa(txt) {
   falarBase(txt, () => { janelaAte = Date.now() + 12000; });
   if (!cfg.voz) janelaAte = Date.now() + 12000;
@@ -345,7 +413,7 @@ function tratarFala(frase) {
 }
 
 function ouvir() {
-  if (!Reconhecedor || ouvindo || speechSynthesis?.speaking) return;
+  if (!Reconhecedor || ouvindo || falando()) return;
   rec = new Reconhecedor();
   rec.lang = "pt-BR";
   rec.interimResults = true;
@@ -361,7 +429,7 @@ function ouvir() {
   };
   rec.onend = () => {
     ouvindo = false; btnMic.setAttribute("aria-pressed", "false");
-    if (cfg.ouvir && !speechSynthesis?.speaking) setTimeout(ouvir, 300);
+    if (cfg.ouvir && !falando()) setTimeout(ouvir, 300);
   };
   rec.onerror = (e) => {
     if (e.error === "not-allowed" || e.error === "service-not-allowed") {
@@ -378,7 +446,7 @@ function pararOuvir(temporario) {
 }
 // Toque no mic: a próxima frase vai direto pro Parça, sem palavra de ativação.
 btnMic.addEventListener("click", () => {
-  speechSynthesis?.cancel();
+  pararFala();
   apertouMic = true;
   status("Pode falar…", "lendo");
   if (!ouvindo) ouvir();
@@ -388,6 +456,8 @@ btnMic.addEventListener("click", () => {
 $("btnIniciar").addEventListener("click", () => {
   // Desbloqueia a voz no iOS (precisa de gesto do usuário).
   if ("speechSynthesis" in window) speechSynthesis.speak(new SpeechSynthesisUtterance(""));
+  player.src = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=";
+  player.play().catch(() => {});
   ligarCamera();
 });
 
@@ -406,7 +476,7 @@ const btnVoz = $("btnVoz");
 function syncVoz() { btnVoz.setAttribute("aria-pressed", String(cfg.voz)); btnVoz.textContent = cfg.voz ? "🔊" : "🔇"; }
 btnVoz.addEventListener("click", () => {
   cfg.voz = !cfg.voz; LS.set("voz", cfg.voz); syncVoz();
-  if (!cfg.voz) speechSynthesis?.cancel();
+  if (!cfg.voz) pararFala();
 });
 syncVoz();
 
@@ -417,7 +487,7 @@ $("btnPausa").addEventListener("click", () => {
   if (pausado) { clearTimeout(timer); status("Pausado", "pausado"); } else agendar(300);
 });
 
-const CAMPOS = { gemini: "cfgGemini", velocidade: "cfgVelocidade", intervalo: "cfgIntervalo", foco: "cfgFoco", spoilers: "cfgSpoilers", pular: "cfgPular", chave: "cfgChave", ouvir: "cfgOuvir", ativacao: "cfgAtivacao", nome: "cfgNome" };
+const CAMPOS = { vozIA: "cfgVozIA", vozNome: "cfgVozNome", gemini: "cfgGemini", velocidade: "cfgVelocidade", intervalo: "cfgIntervalo", foco: "cfgFoco", spoilers: "cfgSpoilers", pular: "cfgPular", chave: "cfgChave", ouvir: "cfgOuvir", ativacao: "cfgAtivacao", nome: "cfgNome" };
 const dlg = $("config");
 $("btnConfig").addEventListener("click", () => {
   for (const [k, id] of Object.entries(CAMPOS)) {
@@ -473,3 +543,13 @@ function listarGuia() {
 }
 $("btnGuia").addEventListener("click", abrirGuia);
 $("guiaBusca").addEventListener("input", listarGuia);
+
+// Testar a voz nas configurações (usa a escolha atual do formulário, mesmo antes de salvar).
+$("btnTestarVoz").addEventListener("click", () => {
+  cfg.vozIA = $("cfgVozIA").checked;
+  cfg.vozNome = $("cfgVozNome").value;
+  cfg.velocidade = Number($("cfgVelocidade").value);
+  cfg.gemini = $("cfgGemini").value.trim() || cfg.gemini;
+  vozIAPausadaAte = 0;
+  falarBase(`Fala, ${cfg.nome || "John"}! Essa é minha voz. Se tiver estrela de procurado, me chama que eu te explico o caminho certinho.`);
+});
