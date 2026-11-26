@@ -40,17 +40,54 @@ function status(txt, tipo = "") {
   el.querySelector("span").textContent = txt;
 }
 
-// ---------- Câmera ----------
+// ---------- Câmera (com vigia: se travar, religa sozinha) ----------
+let streamCam = null, ultimoQuadro = 0, religando = false;
+
+async function abrirStream() {
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+    audio: false,
+  });
+  streamCam?.getTracks().forEach((t) => t.stop());
+  streamCam = stream;
+  video.srcObject = stream;
+  const trilha = stream.getVideoTracks()[0];
+  trilha?.addEventListener("ended", () => religarCamera("trilha encerrada"));
+  await video.play();
+  ultimoQuadro = performance.now();
+  if (video.requestVideoFrameCallback) {          // conta quadros novos de verdade
+    if (idQuadro) video.cancelVideoFrameCallback?.(idQuadro);
+    const loop = () => { ultimoQuadro = performance.now(); idQuadro = video.requestVideoFrameCallback(loop); };
+    idQuadro = video.requestVideoFrameCallback(loop);
+  }
+}
+
+// Sem requestVideoFrameCallback: usa o currentTime andando.
+let ultimoTempo = -1, idQuadro = 0, religadas = [];
+setInterval(() => {
+  if ($("app").hidden || document.visibilityState !== "visible" || religando) return;
+  if (!video.requestVideoFrameCallback && video.currentTime !== ultimoTempo) { ultimoTempo = video.currentTime; ultimoQuadro = performance.now(); }
+  const trilha = streamCam?.getVideoTracks()[0];
+  if (video.paused) video.play().catch(() => {});
+  if (!trilha || trilha.readyState === "ended" || performance.now() - ultimoQuadro > 3500) religarCamera("sem imagem");
+}, 1500);
+
+async function religarCamera(motivo) {
+  if (religando) return;
+  religadas = religadas.filter((t) => Date.now() - t < 30000);
+  if (religadas.length >= 3) { status("Câmera instável: fecha e abre o app", "erro"); ultimoQuadro = performance.now() + 30000; return; }
+  religadas.push(Date.now());
+  religando = true;
+  status("Religando a câmera…", "pausado");
+  console.warn("Câmera travou, religando:", motivo);
+  try { await abrirStream(); status("Câmera ok", "ok"); }
+  catch (e) { status("Câmera falhou: toca em ⏸ e ▶", "erro"); }
+  finally { religando = false; ultimoQuadro = performance.now(); }
+}
+
 async function ligarCamera() {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-      audio: false,
-    });
-    video.srcObject = stream;
-    // foco contínuo e exposição automática ajudam a ler a TV
-    stream.getVideoTracks()[0]?.applyConstraints({ advanced: [{ focusMode: "continuous" }, { exposureMode: "continuous" }] }).catch(() => {});
-    await video.play();
+    await abrirStream();
     $("inicio").hidden = true;
     $("app").hidden = false;
     pedirWakeLock();
@@ -66,6 +103,7 @@ async function pedirWakeLock() {
   try { wakeLock = await navigator.wakeLock?.request("screen"); } catch {}
 }
 document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && streamCam) { ultimoQuadro = performance.now(); video.play().catch(() => {}); }
   if (document.visibilityState === "visible" && !$("app").hidden) pedirWakeLock();
 });
 
@@ -517,6 +555,7 @@ async function gravarPergunta() {
   bip();
   await fim;
   proc.disconnect(); fonte.disconnect(); stream.getTracks().forEach((t) => t.stop());
+  ultimoQuadro = Math.min(ultimoQuadro, performance.now() - 2000); video.play().catch(() => {}); // vigia confere a câmera logo
   const taxaOrig = ac.sampleRate; ac.close();
   gravando = null;
   btnMic.setAttribute("aria-pressed", "false");
@@ -562,7 +601,7 @@ $("btnPausa").addEventListener("click", () => {
   pausado = !pausado;
   $("btnPausa").textContent = pausado ? "▶" : "⏸";
   $("btnPausa").setAttribute("aria-label", pausado ? "Continuar" : "Pausar");
-  if (pausado) { clearTimeout(timer); status("Pausado", "pausado"); } else agendar(300);
+  if (pausado) { clearTimeout(timer); status("Pausado", "pausado"); } else { religarCamera("botão continuar"); agendar(300); }
 });
 
 const CAMPOS = { vozIA: "cfgVozIA", vozNome: "cfgVozNome", gemini: "cfgGemini", velocidade: "cfgVelocidade", intervalo: "cfgIntervalo", foco: "cfgFoco", spoilers: "cfgSpoilers", pular: "cfgPular", chave: "cfgChave", ouvir: "cfgOuvir", ativacao: "cfgAtivacao", nome: "cfgNome" };
