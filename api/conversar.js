@@ -15,9 +15,15 @@ Jeito de falar (MUITO importante — vai ser falado em voz alta durante o jogo):
 - Vai ser lido em voz alta: sem markdown, sem listas, sem emoji, sem links, sem parênteses longos.
 - Pode conversar sobre qualquer assunto, como amigo.
 
+Entendendo o que ele fala:
+- A mensagem vem do microfone, com o barulho do jogo e da TV ao fundo. Se vier ÁUDIO, escute e entenda você mesmo.
+- Se vier texto de reconhecimento de voz, pode ter palavras trocadas ("parça" vira "passa", "estrela" vira "estela"...). Interprete pela
+  intenção, pensando no contexto do GTA. Se não fizer sentido nenhum, peça pra ele repetir, em uma frase curta.
+
 Conhecimento:
 - Use o BANCO DE CONHECIMENTO abaixo primeiro. Itens "NÃO CONFIRMADO" só com aviso ("dizem que...").
 - Se for sobre história, missões, finais, glitches, colecionáveis, patches ou algo que você não tem certeza e não está no banco: pesquise na web. Se o banco já responde, NÃO pesquise (é mais rápido).
+- Pra truques, segredos e glitches, vale pesquisar com fonte "tiktok", "youtube" ou "reddit" (muita gente posta lá).
 - Glitches: diga se já foi corrigido e o risco.
 - Spoilers da história: ${spoilers ? "liberados." : "PROIBIDOS. Se a pergunta entrega a história, avisa que é spoiler e pergunta se ele quer saber."}
 - Se vier imagem da tela, use pra entender onde ele está. Se não ajudar, ignore.
@@ -39,15 +45,19 @@ function limparHistorico(historico) {
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ erro: "Use POST" });
 
-  const { mensagem = "", historico = [], imagem, nome = "John", spoilers = false, local = "" } = req.body || {};
-  const texto = String(mensagem).trim().slice(0, 1000);
+  const { mensagem = "", historico = [], imagem, audio, alternativas = [], nome = "John", spoilers = false, local = "" } = req.body || {};
+  const audioB64 = typeof audio === "string" && audio.length < 4_000_000 ? audio.replace(/^data:audio\/\w+;base64,/, "") : null;
+  const alts = (Array.isArray(alternativas) ? alternativas : []).map(String).filter(Boolean).slice(0, 3);
+  const texto = String(mensagem).trim().slice(0, 1000) ||
+    (audioB64 ? "(O jogador falou no áudio anexo. Entenda e responda.)" : "");
   if (!texto) return res.status(400).json({ erro: "Mensagem vazia" });
 
   const nomeLimpo = String(nome).replace(/[^\p{L} '-]/gu, "").slice(0, 30) || "John";
   const system = persona(nomeLimpo, !!spoilers);
   const msgs = limparHistorico(historico);
   const img = limparImagem(imagem);
-  const textoUsuario = (local ? `(Última leitura da tela: ${String(local).slice(0, 200)})\n` : "") + texto;
+  const textoUsuario = (local ? `(Última leitura da tela: ${String(local).slice(0, 200)})\n` : "") + texto +
+    (alts.length ? `\n(O reconhecimento de voz também ouviu: ${alts.map((a) => `"${a.slice(0, 200)}"`).join(" ou ")})` : "");
 
   const iniciarStream = () => {
     res.statusCode = 200;
@@ -66,7 +76,7 @@ export default async function handler(req, res) {
         chave: gkey,
         system: system + "\n\n" + bancoTexto(spoilers),
         historico: msgs,
-        partes: [...(img ? [{ imagem: img }] : []), { texto: textoUsuario }],
+        partes: [...(img ? [{ imagem: img }] : []), ...(audioB64 ? [{ audio: audioB64 }] : []), { texto: textoUsuario }],
         busca: true,
         maxTokens: 3000,
         aoTexto: (t) => { if (!comecou) { iniciarStream(); comecou = true; } enviar({ t }); },

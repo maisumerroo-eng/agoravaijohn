@@ -48,6 +48,8 @@ async function ligarCamera() {
       audio: false,
     });
     video.srcObject = stream;
+    // foco contínuo e exposição automática ajudam a ler a TV
+    stream.getVideoTracks()[0]?.applyConstraints({ advanced: [{ focusMode: "continuous" }, { exposureMode: "continuous" }] }).catch(() => {});
     await video.play();
     $("inicio").hidden = true;
     $("app").hidden = false;
@@ -116,8 +118,9 @@ async function analisar(forcado) {
     return agendar();
   }
   if (forcado) mudouBastante();
-  const imagem = capturar();
+  const imagem = capturar(1600, 0.82);
   if (!imagem) return agendar(1000);
+  const mini = $("miniatura"); if (mini) { mini.src = imagem; mini.hidden = false; }
 
   ocupado = true;
   status("Lendo a tela…", "lendo");
@@ -145,15 +148,16 @@ async function analisar(forcado) {
 
 // ---------- Conversa com o Parça (streaming: fala já a 1ª frase) ----------
 let pensando = false;
-async function conversar(texto) {
-  texto = texto.trim();
-  if (!texto || pensando) return;
+async function conversar(texto, { audio = null, alternativas = [] } = {}) {
+  texto = String(texto || "").trim();
+  if ((!texto && !audio) || pensando) return;
   pensando = true;
   ultimaConversa = Date.now();
   pararFala();
-  mostrarConversa(texto, "…", []);
+  const rotulo = texto || "🎤 (sua voz)";
+  mostrarConversa(rotulo, "…", []);
   status("Parça pensando…", "lendo");
-  const imagem = capturar(768, 0.6);
+  const imagem = capturar(1024, 0.72);
   let resposta = "", pendente = "", fontes = [], pesquisou = false, semBusca = "";
   const soltarFrases = (final) => {
     // fala cada frase assim que ela fecha (. ! ?) — não espera a resposta inteira
@@ -167,7 +171,7 @@ async function conversar(texto) {
     const r = await fetch("/api/conversar", {
       method: "POST",
       headers: headersIA(),
-      body: JSON.stringify({ mensagem: texto, historico: conversa, imagem, nome: cfg.nome, spoilers: cfg.spoilers, local: ultimoLocal }),
+      body: JSON.stringify({ mensagem: texto, audio, alternativas, historico: conversa, imagem, nome: cfg.nome, spoilers: cfg.spoilers, local: ultimoLocal }),
     });
     if (!r.ok) {
       const d = await r.json().catch(() => ({}));
@@ -185,21 +189,21 @@ async function conversar(texto) {
         const linha = buf.slice(0, i); buf = buf.slice(i + 1);
         if (!linha.trim()) continue;
         const d = JSON.parse(linha);
-        if (d.t) { resposta += d.t; pendente += d.t; soltarFrases(false); mostrarConversa(texto, resposta, []); }
+        if (d.t) { resposta += d.t; pendente += d.t; soltarFrases(false); mostrarConversa(rotulo, resposta, []); }
         if (d.erro) throw new Error(d.erro);
         if (d.fim) { fontes = d.fontes || []; pesquisou = !!d.pesquisou; semBusca = d.buscaIndisponivel || ""; }
       }
     }
     soltarFrases(true);
     resposta = resposta.trim() || "Não consegui pensar em nada, repete aí?";
-    conversa.push({ role: "user", content: texto }, { role: "assistant", content: resposta });
+    conversa.push({ role: "user", content: texto || "(falou por áudio)" }, { role: "assistant", content: resposta });
     conversa = conversa.slice(-16);
-    mostrarConversa(texto, resposta, fontes, pesquisou);
+    mostrarConversa(rotulo, resposta, fontes, pesquisou);
     if (!cfg.voz) janelaAte = Date.now() + 12000;
     status(pesquisou ? "Pesquisou na internet" : semBusca ? "Sem busca na internet agora" : "Respondido", semBusca ? "pausado" : "ok");
     if (semBusca) console.warn("Busca indisponível:", semBusca);
   } catch (e) {
-    mostrarConversa(texto, "Deu ruim: " + e.message, []);
+    mostrarConversa(rotulo, "Deu ruim: " + e.message, []);
     status("Erro", "erro");
   } finally {
     pensando = false;
@@ -394,22 +398,22 @@ function falarConversa(txt) {
 
 // ---------- Microfone (reconhecimento automático) ----------
 const Reconhecedor = window.SpeechRecognition || window.webkitSpeechRecognition;
-const ATIVACAO = /\b(parça|parca|parceiro|parsa|copiloto)\b[,!.]?\s*/i;
+const ATIVACAO = /\b(parça|parca|parceiro|parsa|passa|par[sç]a|copiloto)\b[,!.]?\s*/i;
 let rec = null, ouvindo = false, apertouMic = false;
 const btnMic = $("btnMic");
 if (!Reconhecedor) btnMic.hidden = true;
 
-function tratarFala(frase) {
+function tratarFala(frase, alternativas = []) {
   frase = frase.trim();
   if (frase.length < 2) return;
   const livre = apertouMic || !cfg.ativacao || Date.now() < janelaAte;
   apertouMic = false;
-  if (livre) return conversar(frase.replace(ATIVACAO, "") || frase);
-  const m = frase.match(ATIVACAO);
+  if (livre) return conversar(frase.replace(ATIVACAO, "") || frase, { alternativas });
+  const m = frase.match(ATIVACAO) || alternativas.map((a) => a.match(ATIVACAO)).find(Boolean);
   if (!m) return; // barulho do jogo / conversa de fundo: ignora
-  const resto = frase.slice(m.index + m[0].length).trim();
-  if (resto.length > 2) conversar(resto);
-  else falarConversa(`Fala, ${cfg.nome}!`);
+  const resto = frase.slice(frase.search(ATIVACAO) >= 0 ? m.index + m[0].length : 0).trim();
+  if (resto.length > 2) conversar(resto, { alternativas: alternativas.map((a) => a.replace(ATIVACAO, "")) });
+  else falarBase(`Fala, ${cfg.nome}!`, () => gravarPergunta()); // só chamou: grava a pergunta e a IA escuta o áudio
 }
 
 function ouvir() {
@@ -418,13 +422,18 @@ function ouvir() {
   rec.lang = "pt-BR";
   rec.interimResults = true;
   rec.continuous = true;
+  rec.maxAlternatives = 3;
   rec.onresult = (e) => {
     for (let i = e.resultIndex; i < e.results.length; i++) {
       const r = e.results[i];
       const t = r[0].transcript;
       // Mostra o que está ouvindo só quando é com ele.
       if (apertouMic || Date.now() < janelaAte || ATIVACAO.test(t) || !cfg.ativacao) $("inputPergunta").value = t;
-      if (r.isFinal) { $("inputPergunta").value = ""; tratarFala(t); }
+      if (r.isFinal) {
+        $("inputPergunta").value = "";
+        const alts = Array.from({ length: r.length }, (_, k) => r[k]?.transcript).slice(1).filter(Boolean);
+        tratarFala(t, alts);
+      }
     }
   };
   rec.onend = () => {
@@ -444,13 +453,82 @@ function pararOuvir(temporario) {
   try { rec?.abort(); } catch {}
   ouvindo = false; btnMic.setAttribute("aria-pressed", "false");
 }
-// Toque no mic: a próxima frase vai direto pro Parça, sem palavra de ativação.
+// Toque no mic: grava sua pergunta e manda o ÁUDIO pra IA (entende bem melhor com o barulho do jogo).
+// Tocar de novo enquanto grava = parar e enviar.
 btnMic.addEventListener("click", () => {
+  if (gravando) return gravando.parar();
   pararFala();
-  apertouMic = true;
-  status("Pode falar…", "lendo");
-  if (!ouvindo) ouvir();
+  gravarPergunta();
 });
+
+// ---------- Gravação da pergunta (áudio -> IA) ----------
+let gravando = null;
+function bip(freq = 880, ms = 120) {
+  try {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.frequency.value = freq; g.gain.value = 0.08;
+    o.connect(g); g.connect(ac.destination); o.start();
+    setTimeout(() => { o.stop(); ac.close(); }, ms);
+  } catch {}
+}
+function wavDe(amostras, taxa) {
+  const buf = new ArrayBuffer(44 + amostras.length * 2), v = new DataView(buf);
+  const txt = (o, t) => [...t].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+  txt(0, "RIFF"); v.setUint32(4, 36 + amostras.length * 2, true); txt(8, "WAVE"); txt(12, "fmt ");
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, taxa, true);
+  v.setUint32(28, taxa * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); txt(36, "data");
+  v.setUint32(40, amostras.length * 2, true);
+  for (let i = 0; i < amostras.length; i++) v.setInt16(44 + i * 2, Math.max(-1, Math.min(1, amostras[i])) * 0x7fff, true);
+  return new Uint8Array(buf);
+}
+const paraB64 = (bytes) => { let s = ""; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode(...bytes.subarray(i, i + 0x8000)); return btoa(s); };
+
+async function gravarPergunta() {
+  if (gravando || pensando) return;
+  pararOuvir(true);
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+  } catch {
+    status("Microfone bloqueado", "erro");
+    return;
+  }
+  const ac = new (window.AudioContext || window.webkitAudioContext)();
+  const fonte = ac.createMediaStreamSource(stream);
+  const proc = ac.createScriptProcessor(4096, 1, 1);
+  const pedacos = [];
+  let falou = false, silencioDesde = 0, ruido = 0.01, inicio = performance.now(), acabou;
+  const fim = new Promise((r) => (acabou = r));
+  proc.onaudioprocess = (e) => {
+    const d = e.inputBuffer.getChannelData(0);
+    pedacos.push(new Float32Array(d));
+    let soma = 0; for (let i = 0; i < d.length; i++) soma += d[i] * d[i];
+    const rms = Math.sqrt(soma / d.length), t = performance.now() - inicio;
+    if (t < 300) { ruido = Math.max(ruido, rms); return; }      // mede o barulho do ambiente (TV/jogo)
+    if (rms > ruido * 1.8 + 0.01) { falou = true; silencioDesde = 0; }
+    else if (falou && !silencioDesde) silencioDesde = performance.now();
+    if ((falou && silencioDesde && performance.now() - silencioDesde > 1100) || t > 9000 || (!falou && t > 5000)) acabou();
+  };
+  fonte.connect(proc); proc.connect(ac.destination);
+  gravando = { parar: () => acabou() };
+  btnMic.setAttribute("aria-pressed", "true");
+  status("Gravando… fala agora", "lendo");
+  bip();
+  await fim;
+  proc.disconnect(); fonte.disconnect(); stream.getTracks().forEach((t) => t.stop());
+  const taxaOrig = ac.sampleRate; ac.close();
+  gravando = null;
+  btnMic.setAttribute("aria-pressed", "false");
+  bip(660, 90);
+  if (!falou) { status("Não ouvi nada", "pausado"); if (cfg.ouvir) setTimeout(ouvir, 300); return; }
+  // junta e reduz pra 16 kHz mono (arquivo pequeno, sobe rápido)
+  const total = pedacos.reduce((n, p) => n + p.length, 0), junto = new Float32Array(total);
+  let pos = 0; for (const p of pedacos) { junto.set(p, pos); pos += p.length; }
+  const passo = taxaOrig / 16000, saida = new Float32Array(Math.floor(total / passo));
+  for (let i = 0; i < saida.length; i++) saida[i] = junto[Math.floor(i * passo)];
+  conversar("", { audio: paraB64(wavDe(saida, 16000)) });
+}
 
 // ---------- Controles ----------
 $("btnIniciar").addEventListener("click", () => {

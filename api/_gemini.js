@@ -53,7 +53,7 @@ export function respostaErroGemini(e, res, chave = "") {
 // (minimal | low | medium | high). Gemini 3 usa thinkingLevel; 2.5 usa thinkingBudget.
 const nivel = () => process.env.GEMINI_PENSAMENTO || "low";
 const ORCAMENTO_25 = { minimal: 0, low: 512, medium: 2048, high: 8192 };
-const pensar = (m) => (/^gemini-2\./.test(m) ? { thinkingBudget: ORCAMENTO_25[nivel()] ?? 512 } : { thinkingLevel: nivel() });
+const pensar = (m, n = nivel()) => (/^gemini-2\./.test(m) ? { thinkingBudget: ORCAMENTO_25[n] ?? 512 } : { thinkingLevel: n });
 
 // JSON Schema (o do Claude) -> schema OpenAPI que o Gemini aceita.
 export function paraSchemaGemini(s) {
@@ -74,7 +74,10 @@ const FERRAMENTA_BUSCA = {
   functionDeclarations: [{
     name: "pesquisar_web",
     description: "Pesquisa na internet. Use para fatos recentes do GTA VI (notas, patches, glitches, missões, datas, preços) que não estão no banco de conhecimento.",
-    parameters: { type: "OBJECT", properties: { consulta: { type: "STRING", description: "Termos de busca curtos, de preferência em inglês e com 'GTA 6'." } }, required: ["consulta"] },
+    parameters: { type: "OBJECT", properties: {
+      consulta: { type: "STRING", description: "Termos de busca curtos, de preferência em inglês e com 'GTA 6'." },
+      fonte: { type: "STRING", enum: ["geral", "tiktok", "reddit", "youtube"], description: "Onde procurar. tiktok/youtube = vídeos de dicas e segredos; reddit = comunidade (glitches, bugs, dúvidas)." },
+    }, required: ["consulta"] },
   }],
 };
 
@@ -112,13 +115,13 @@ async function lerResposta(r, aoTexto) {
 
 // Ordem: modelo que funcionou por último -> outros. Busca: 1) Google Search (se tiver cota); 2) busca grátis
 // via função (DuckDuckGo); 3) sem busca, avisando pra não chutar. 429 = sem cota: próximo modelo.
-export async function gerarGemini({ chave, system, historico = [], partes, schema, busca = false, maxTokens = 800, aoTexto }) {
+export async function gerarGemini({ chave, system, historico = [], partes, schema, busca = false, maxTokens = 800, aoTexto, pensamento }) {
   const { buscarWeb } = await import("./_busca.js");
   const lista = await listarModelos(chave);
   const modelos = modeloBom && lista.includes(modeloBom) ? [modeloBom, ...lista.filter((m) => m !== modeloBom)] : lista;
   const contents = [
     ...historico.map((h) => ({ role: h.role === "assistant" ? "model" : "user", parts: [{ text: h.content }] })),
-    { role: "user", parts: partes.map((p) => (p.imagem ? imagemParte(p.imagem) : { text: p.texto })) },
+    { role: "user", parts: partes.map((p) => (p.imagem ? imagemParte(p.imagem) : p.audio ? { inline_data: { mime_type: "audio/wav", data: p.audio } } : { text: p.texto })) },
   ];
   const AVISO_SEM_BUSCA = "\n\nATENÇÃO: a busca na internet está indisponível agora. NÃO chute números, notas, datas, preços ou fatos que não estão no banco. Se precisar disso, diga curto que não conseguiu pesquisar agora.";
   const AVISO_FUNCAO = "\n\nPra pesquisar na internet, chame a função pesquisar_web (só quando o banco não responde).";
@@ -128,7 +131,7 @@ export async function gerarGemini({ chave, system, historico = [], partes, schem
     generationConfig: {
       maxOutputTokens: maxTokens,
       temperature: 0.7,
-      ...(opc.pensar ? { thinkingConfig: pensar(modelo) } : {}),
+      ...(opc.pensar ? { thinkingConfig: pensar(modelo, pensamento) } : {}),
       ...(schema ? { responseMimeType: "application/json", responseSchema: paraSchemaGemini(schema) } : {}),
     },
     ...(opc.busca === "google" ? { tools: [{ google_search: {} }] } : opc.busca === "funcao" ? { tools: [FERRAMENTA_BUSCA] } : {}),
@@ -167,7 +170,8 @@ export async function gerarGemini({ chave, system, historico = [], partes, schem
     // O modelo pediu pesquisa (busca grátis): pesquisa e pede a resposta final com os resultados.
     if (opcUsada.busca === "funcao" && out.chamadas.length) {
       const chamada = out.chamadas[0];
-      const consulta = String(chamada.functionCall.args?.consulta || "").slice(0, 200);
+      const SITES = { tiktok: " site:tiktok.com", reddit: " site:reddit.com", youtube: " site:youtube.com" };
+      const consulta = String(chamada.functionCall.args?.consulta || "").slice(0, 200) + (SITES[chamada.functionCall.args?.fonte] || "");
       const achado = await buscarWeb(consulta);
       const fontesWeb = achado.resultados.slice(0, 4).map((x) => ({ titulo: x.titulo, url: x.url }));
       const extra = [
