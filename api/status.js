@@ -9,7 +9,7 @@ export default function handler(req, res) {
   }));
   res.setHeader("Cache-Control", "no-store");
   res.status(200).json({
-    versao: "2026-11-26e",
+    versao: "2026-11-26f",
     ia: gem.some((k) => limparChave(process.env[k]).length >= 20) ? "gemini" : process.env.ANTHROPIC_API_KEY ? "anthropic" : "vercel-ai-gateway",
     variaveis_gemini: formato,
     ambiente: process.env.VERCEL_ENV || "local",

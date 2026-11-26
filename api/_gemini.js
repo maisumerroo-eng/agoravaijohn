@@ -14,7 +14,7 @@ const chaveEnv = () => {
 export const chaveGemini = (req) => String(req.headers["x-gemini-key"] || "").trim() || chaveEnv();
 
 // Lista de modelos candidatos (mais rápidos/baratos primeiro). Se um der "sem cota" (429), tenta o próximo.
-let listaCache = null, modeloBom = null;
+let listaCache = null, modeloBom = null, buscaBloqueadaAte = 0;
 async function listarModelos(chave) {
   if (process.env.GEMINI_MODELO) return [process.env.GEMINI_MODELO];
   if (listaCache && Date.now() - listaCache.em < 6 * 3600e3) return listaCache.nomes;
@@ -47,11 +47,11 @@ export function respostaErroGemini(e, res, chave = "") {
   return res.status(502).json({ erro: "Erro no Gemini: " + msg });
 }
 
-// Pensamento MÉDIO (padrão): respostas melhores sem ficar lento demais. Muda com a env GEMINI_PENSAMENTO
+// Pensamento BAIXO (padrão): o jogo é rápido, prioriza velocidade. Muda com a env GEMINI_PENSAMENTO
 // (minimal | low | medium | high). Gemini 3 usa thinkingLevel; 2.5 usa thinkingBudget.
-const NIVEL = process.env.GEMINI_PENSAMENTO || "medium";
+const NIVEL = process.env.GEMINI_PENSAMENTO || "low";
 const ORCAMENTO_25 = { minimal: 0, low: 512, medium: 2048, high: 8192 };
-const pensar = (m) => (/^gemini-2\./.test(m) ? { thinkingBudget: ORCAMENTO_25[NIVEL] ?? 2048 } : { thinkingLevel: NIVEL });
+const pensar = (m) => (/^gemini-2\./.test(m) ? { thinkingBudget: ORCAMENTO_25[NIVEL] ?? 512 } : { thinkingLevel: NIVEL });
 
 // JSON Schema (o do Claude) -> schema OpenAPI que o Gemini aceita.
 export function paraSchemaGemini(s) {
@@ -91,11 +91,13 @@ export async function gerarGemini({ chave, system, historico = [], partes, schem
 
   // Fase 1 (se pediu busca): tenta a busca em TODOS os modelos (no grátis às vezes só alguns têm cota de busca).
   // Fase 2: sem busca, no primeiro modelo com cota.
-  const fases = busca
+  const tentarBusca = busca && Date.now() > buscaBloqueadaAte;
+  const fases = tentarBusca
     ? [[{ pensar: true, busca: true }, { pensar: false, busca: true }], [{ pensar: true, busca: false }, { pensar: false, busca: false }]]
     : [[{ pensar: true, busca: false }, { pensar: false, busca: false }]];
-  let ultimoErro, erroBusca = null;
-  for (const tentativas of fases) for (const modelo of modelos) {
+  let ultimoErro, erroBusca = busca && !tentarBusca ? "busca sem cota (pausada por 10 min)" : null;
+  for (const [fase, tentativas] of fases.entries()) for (const modelo of modelos) {
+    if (tentarBusca && fase === 1 && Date.now() > buscaBloqueadaAte) buscaBloqueadaAte = Date.now() + 10 * 60e3; // nenhum modelo tinha busca
     let r = null, opcUsada = null;
     for (const opc of tentativas) {
       const url = `${BASE}/models/${modelo}:${aoTexto ? "streamGenerateContent?alt=sse" : "generateContent"}`;
