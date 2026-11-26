@@ -89,9 +89,13 @@ export async function gerarGemini({ chave, system, historico = [], partes, schem
     ...(opc.busca ? { tools: [{ google_search: {} }] } : {}),
   });
 
-  const tentativas = [{ pensar: true, busca }, { pensar: false, busca }, ...(busca ? [{ pensar: true, busca: false }, { pensar: false, busca: false }] : [])];
+  // Fase 1 (se pediu busca): tenta a busca em TODOS os modelos (no grátis às vezes só alguns têm cota de busca).
+  // Fase 2: sem busca, no primeiro modelo com cota.
+  const fases = busca
+    ? [[{ pensar: true, busca: true }, { pensar: false, busca: true }], [{ pensar: true, busca: false }, { pensar: false, busca: false }]]
+    : [[{ pensar: true, busca: false }, { pensar: false, busca: false }]];
   let ultimoErro, erroBusca = null;
-  for (const modelo of modelos) {
+  for (const tentativas of fases) for (const modelo of modelos) {
     let r = null, opcUsada = null;
     for (const opc of tentativas) {
       const url = `${BASE}/models/${modelo}:${aoTexto ? "streamGenerateContent?alt=sse" : "generateContent"}`;
@@ -105,8 +109,7 @@ export async function gerarGemini({ chave, system, historico = [], partes, schem
       ultimoErro.message = `[${modelo}] ${ultimoErro.message}`;
       if (opc.busca) erroBusca = `${resp.status}: ${ultimoErro.message.slice(0, 140)}`;
       if (resp.status === 400 && !/api key/i.test(ultimoErro.message)) continue; // parâmetro não suportado
-      if (resp.status === 429 && opc.busca) continue;                            // talvez só a busca esteja sem cota
-      if (resp.status === 429 || resp.status === 404) break;                     // modelo sem cota: próximo modelo
+      if (resp.status === 429 || resp.status === 404) break;                     // sem cota: próximo modelo
       throw ultimoErro;
     }
     if (!r) continue;
