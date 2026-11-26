@@ -37,8 +37,11 @@ export function respostaErroGemini(e, res) {
   return res.status(502).json({ erro: "Erro no Gemini: " + msg });
 }
 
-// Config de "pensamento" mínimo = resposta mais rápida. Gemini 3 usa thinkingLevel; 2.5 usa thinkingBudget.
-const pensarPouco = (m) => (/^gemini-2\./.test(m) ? { thinkingBudget: 0 } : { thinkingLevel: "minimal" });
+// Pensamento MÉDIO (padrão): respostas melhores sem ficar lento demais. Muda com a env GEMINI_PENSAMENTO
+// (minimal | low | medium | high). Gemini 3 usa thinkingLevel; 2.5 usa thinkingBudget.
+const NIVEL = process.env.GEMINI_PENSAMENTO || "medium";
+const ORCAMENTO_25 = { minimal: 0, low: 512, medium: 2048, high: 8192 };
+const pensar = (m) => (/^gemini-2\./.test(m) ? { thinkingBudget: ORCAMENTO_25[NIVEL] ?? 2048 } : { thinkingLevel: NIVEL });
 
 // JSON Schema (o do Claude) -> schema OpenAPI que o Gemini aceita.
 export function paraSchemaGemini(s) {
@@ -67,7 +70,7 @@ export async function gerarGemini({ chave, system, historico = [], partes, schem
     generationConfig: {
       maxOutputTokens: maxTokens,
       temperature: 0.7,
-      ...(opc.pensar ? { thinkingConfig: pensarPouco(modelo) } : {}),
+      ...(opc.pensar ? { thinkingConfig: pensar(modelo) } : {}),
       ...(schema ? { responseMimeType: "application/json", responseSchema: paraSchemaGemini(schema) } : {}),
     },
     ...(opc.busca ? { tools: [{ google_search: {} }] } : {}),

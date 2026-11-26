@@ -66,7 +66,7 @@ export default async function handler(req, res) {
         system: SYSTEM + "\n\n" + bancoTexto(spoilers),
         partes: [{ imagem: data }, { texto: contexto }],
         schema: SCHEMA,
-        maxTokens: 700,
+        maxTokens: 4000,
       });
       return res.status(200).json(JSON.parse(r.texto.slice(r.texto.indexOf("{"), r.texto.lastIndexOf("}") + 1)));
     } catch (e) {

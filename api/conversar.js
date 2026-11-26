@@ -66,7 +66,7 @@ export default async function handler(req, res) {
         historico: msgs,
         partes: [...(img ? [{ imagem: img }] : []), { texto: textoUsuario }],
         busca: true,
-        maxTokens: 400,
+        maxTokens: 3000,
         aoTexto: (t) => { if (!comecou) { iniciarStream(); comecou = true; } enviar({ t }); },
       });
       if (!comecou) { iniciarStream(); enviar({ t: r.texto || "Não consegui pensar em nada, repete aí?" }); }
