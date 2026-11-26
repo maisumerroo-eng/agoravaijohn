@@ -3,7 +3,12 @@
 const BASE = process.env.GEMINI_BASE || "https://generativelanguage.googleapis.com/v1beta";
 const PREFERIDOS = [/^gemini-3\.\d+-flash-lite$/, /^gemini-2\.5-flash-lite$/, /^gemini-[\d.]+-flash-lite/, /^gemini-[\d.]+-flash$/];
 
-export const chaveGemini = (req) => process.env.GEMINI_API_KEY || String(req.headers["x-gemini-key"] || "") || null;
+// Aceita GEMINI_API_KEY ou qualquer variável com "gemini"/"gemenina"/etc. no nome cujo valor pareça chave do Google.
+const chaveEnv = () =>
+  process.env.GEMINI_API_KEY ||
+  Object.entries(process.env).find(([k, v]) => /gem[ei]n/i.test(k) && /^AIza[\w-]{20,}$/.test(String(v).trim()))?.[1]?.trim() ||
+  null;
+export const chaveGemini = (req) => String(req.headers["x-gemini-key"] || "").trim() || chaveEnv();
 
 let modeloCache = null;
 async function escolherModelo(chave) {
